@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>AURA NET 法人内ポータル</title>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -271,27 +270,17 @@ body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;background:#f0f
 <script>
 // ── Firebase設定（village-aura プロジェクト） ──
 const FB_CONFIG = {
-  apiKey:'AIzaSyBOU4Z48gIhbndtRSKiTH8fcQAjlKgncD8',
-  authDomain:'village-aura.firebaseapp.com',
-  projectId:'village-aura',
-  storageBucket:'village-aura.firebasestorage.app',
-  appId:'1:559931440710:web:c8f37e31163ba229501447'
+  apiKey:'AIzaSyBxXY1aji7J9H0qwrV76VgPxaHJ4wU9E-I',
+  authDomain:'aura-net-portal.firebaseapp.com',
+  projectId:'aura-net-portal',
+  storageBucket:'aura-net-portal.firebasestorage.app',
+  appId:'1:893378399815:web:eff366abc877fc8206ab62'
 };
-// reCAPTCHA Enterprise サイトキー（ポータル公開時はポータルドメイン用のキーに差し替える）
-const RECAPTCHA_KEY = '6LcastgsAAAAAHFjkxmkwvQ2n_-rmKqDfIpSqjCB';
-// 共通アカウント（カルテと同じ village-aura プロジェクトのシステムアカウント）
-const FB_SYS_EMAIL = 'facility@village-aura.local';
-const FB_SYS_PASS  = 'Vp7#Xm2-Lq9Kz';
+const FB_SYS_EMAIL = 'portal@aura-net.local';
+const FB_SYS_PASS  = 'Ap3#Rz7-Mn4Kw';
 
 // ── 初期化 ──
 firebase.initializeApp(FB_CONFIG);
-// ローカル（file://）ではApp Checkをスキップ・公開後は有効になる
-if(location.protocol !== 'file:'){
-  firebase.appCheck().activate(
-    new firebase.appCheck.ReCaptchaEnterpriseProvider(RECAPTCHA_KEY),
-    true
-  );
-}
 const auth = firebase.auth();
 
 // ── 画面切替 ──
