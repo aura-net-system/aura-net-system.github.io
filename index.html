@@ -6,214 +6,167 @@
 <title>AURA NET 法人内ポータル</title>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100vh;color:#1a202c;overflow-x:hidden}
-
-/* ── 背景グラデーション ── */
-.bg-layer{
-  position:fixed;inset:0;z-index:0;
-  background:linear-gradient(145deg,#5bbfff 0%,#1a72c8 35%,#0d3a7a 65%,#061428 100%);
-}
+.bg-layer{position:fixed;inset:0;z-index:0;background:linear-gradient(145deg,#5bbfff 0%,#1a72c8 35%,#0d3a7a 65%,#061428 100%)}
 .bg-curves{position:fixed;inset:0;z-index:1;width:100%;height:100%;pointer-events:none}
 
-/* ── ローディング ── */
-#loading-screen{
-  position:fixed;inset:0;z-index:100;
-  display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;
-  background:linear-gradient(145deg,#5bbfff 0%,#1a72c8 35%,#0d3a7a 65%,#061428 100%);
-}
+/* ローディング */
+#loading-screen{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:linear-gradient(145deg,#5bbfff 0%,#1a72c8 35%,#0d3a7a 65%,#061428 100%)}
 .spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ── ログイン画面 ── */
-#login-screen{
-  position:relative;z-index:10;
-  display:none;align-items:center;justify-content:center;
-  min-height:100vh;padding:20px;
-}
-.login-wrap{
-  display:flex;align-items:center;justify-content:center;
-  width:100%;max-width:960px;gap:60px;
-}
-.login-brand-area{
-  flex:1;color:#fff;display:none;
-}
+/* ログイン */
+#login-screen{position:relative;z-index:10;display:none;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.login-wrap{display:flex;align-items:center;justify-content:center;width:100%;max-width:960px;gap:60px}
+.login-brand-area{flex:1;color:#fff;display:none}
 .login-brand-area h2{font-size:28px;font-weight:800;letter-spacing:.02em;line-height:1.3;margin-bottom:12px}
 .login-brand-area p{font-size:15px;opacity:.75;line-height:1.7}
-
-.login-card{
-  background:rgba(255,255,255,0.13);
-  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-  border:1px solid rgba(255,255,255,0.22);
-  border-radius:24px;padding:44px 40px;
-  width:100%;max-width:400px;
-  box-shadow:0 8px 40px rgba(0,0,0,.25);
-}
+.login-card{background:rgba(255,255,255,0.13);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.22);border-radius:24px;padding:44px 40px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,.25)}
 .login-logo-wrap{text-align:center;margin-bottom:28px}
-.login-logo-wrap img{
-  height:80px;width:auto;
-  background:rgba(255,255,255,.92);
-  border-radius:16px;padding:10px 18px;
-  display:inline-block;
-}
-.login-card h1{
-  text-align:center;font-size:19px;font-weight:800;
-  color:#fff;letter-spacing:.03em;margin-bottom:4px;
-}
-.login-card .subtitle{
-  text-align:center;font-size:12px;color:rgba(255,255,255,.6);
-  margin-bottom:28px;letter-spacing:.05em;
-}
-.login-card label{
-  display:block;font-size:11px;font-weight:700;
-  color:rgba(255,255,255,.7);margin-bottom:8px;
-  letter-spacing:.08em;text-transform:uppercase;
-}
-.login-card input{
-  width:100%;padding:12px 16px;
-  background:rgba(255,255,255,.12);
-  border:1px solid rgba(255,255,255,.25);
-  border-radius:10px;font-size:15px;color:#fff;outline:none;
-  transition:border .2s,background .2s;margin-bottom:20px;
-}
+.login-logo-wrap img{height:80px;width:auto;background:rgba(255,255,255,.92);border-radius:16px;padding:10px 18px;display:inline-block}
+.login-card h1{text-align:center;font-size:19px;font-weight:800;color:#fff;letter-spacing:.03em;margin-bottom:4px}
+.login-card .subtitle{text-align:center;font-size:12px;color:rgba(255,255,255,.6);margin-bottom:28px;letter-spacing:.05em}
+.login-card label{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:8px;letter-spacing:.08em;text-transform:uppercase}
+.login-card input{width:100%;padding:12px 16px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:10px;font-size:15px;color:#fff;outline:none;transition:border .2s,background .2s;margin-bottom:20px}
 .login-card input::placeholder{color:rgba(255,255,255,.4)}
 .login-card input:focus{border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.18)}
-.btn-login{
-  width:100%;padding:13px;
-  background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(220,240,255,.95));
-  color:#0d3a7a;border:none;border-radius:10px;
-  font-size:15px;font-weight:800;cursor:pointer;
-  transition:opacity .2s,transform .1s;letter-spacing:.03em;
-}
+.btn-login{width:100%;padding:13px;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(220,240,255,.95));color:#0d3a7a;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;transition:opacity .2s,transform .1s;letter-spacing:.03em}
 .btn-login:hover{opacity:.9;transform:translateY(-1px)}
 .btn-login:disabled{opacity:.5;cursor:not-allowed;transform:none}
-#login-error{
-  display:none;background:rgba(255,100,100,.18);
-  border:1px solid rgba(255,150,150,.4);
-  color:#ffe0e0;border-radius:8px;padding:10px 14px;
-  font-size:13px;margin-top:12px;text-align:center;
-}
+#login-error{display:none;background:rgba(255,100,100,.18);border:1px solid rgba(255,150,150,.4);color:#ffe0e0;border-radius:8px;padding:10px 14px;font-size:13px;margin-top:12px;text-align:center}
 
-/* ── ポータル画面 ── */
+/* ポータル共通 */
 #portal-screen{display:none;min-height:100vh;position:relative;z-index:10}
-
-.portal-header{
-  background:rgba(6,20,40,.6);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border-bottom:1px solid rgba(255,255,255,.1);
-  color:#fff;padding:0 24px;height:64px;
-  display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:100;
-}
-.portal-header-left{display:flex;align-items:center;gap:14px}
-.hd-logo{
-  height:40px;width:auto;
-  background:rgba(255,255,255,.9);
-  border-radius:8px;padding:4px 10px;
-}
-.hd-texts .h-title{font-size:16px;font-weight:800;color:#fff}
-.hd-texts .h-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:1px}
-.header-right{display:flex;align-items:center;gap:10px}
-.user-badge{
-  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
-  color:rgba(255,255,255,.8);border-radius:20px;padding:4px 12px;font-size:12px;
-}
-.btn-logout{
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
-  color:#fff;border-radius:8px;padding:6px 14px;font-size:13px;cursor:pointer;
-  transition:background .2s;
-}
+.portal-header{background:rgba(6,20,40,.65);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.1);color:#fff;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.portal-header-left{display:flex;align-items:center;gap:12px}
+.hd-logo{height:36px;width:auto;background:rgba(255,255,255,.9);border-radius:7px;padding:3px 8px}
+.hd-texts .h-title{font-size:15px;font-weight:800;color:#fff}
+.hd-texts .h-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:1px}
+.header-right{display:flex;align-items:center;gap:8px}
+.admin-badge{background:rgba(255,200,80,.2);border:1px solid rgba(255,200,80,.4);color:#ffd966;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700}
+.btn-logout{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:7px;padding:5px 12px;font-size:12px;cursor:pointer;transition:background .2s}
 .btn-logout:hover{background:rgba(255,255,255,.2)}
 
-.portal-main{
-  padding:32px 24px;max-width:1100px;margin:0 auto;
-  position:relative;z-index:1;
-}
-.section-title{
-  font-size:12px;font-weight:700;color:rgba(255,255,255,.5);
-  letter-spacing:.08em;text-transform:uppercase;
-  margin-bottom:16px;margin-top:36px;
-}
-.section-title:first-child{margin-top:0}
+/* ナビゲーション */
+.portal-nav{background:rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.08);display:flex;padding:0 20px;overflow-x:auto;scrollbar-width:none}
+.portal-nav::-webkit-scrollbar{display:none}
+.nav-btn{flex-shrink:0;padding:12px 18px;font-size:13px;font-weight:700;color:rgba(255,255,255,.55);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .18s;white-space:nowrap}
+.nav-btn.active{color:#fff;border-bottom-color:#5bbfff}
+.nav-btn:hover:not(.active){color:rgba(255,255,255,.8)}
 
-.notice-box{
-  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
-  backdrop-filter:blur(8px);
-  border-radius:14px;padding:16px 20px;
-  font-size:13px;color:rgba(255,255,255,.85);line-height:1.7;
-  margin-bottom:8px;
-}
-.notice-box strong{color:#fff;font-weight:700}
+/* 画面 */
+.screen{display:none;padding:24px 20px;max-width:960px;margin:0 auto}
+.screen.active{display:block}
 
-.app-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:16px;
-}
-.app-card{
-  background:rgba(255,255,255,.1);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  border:1px solid rgba(255,255,255,.15);
-  border-radius:16px;padding:22px 20px;
-  cursor:pointer;transition:all .22s;
-  text-decoration:none;color:inherit;display:block;
-}
-.app-card:hover:not(.disabled){
-  background:rgba(255,255,255,.18);
-  border-color:rgba(255,255,255,.35);
-  transform:translateY(-3px);
-  box-shadow:0 8px 24px rgba(0,0,0,.2);
-}
-.app-card.disabled{cursor:default;opacity:.55}
-.card-icon{
-  width:48px;height:48px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:22px;margin-bottom:14px;
-  background:rgba(255,255,255,.15);
-}
-.card-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:4px}
+/* カード共通 */
+.glass-card{background:rgba(255,255,255,.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:20px}
+.section-label{font-size:11px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;margin-bottom:14px}
+
+/* ホーム */
+.app-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.app-card{background:rgba(255,255,255,.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:20px;cursor:pointer;transition:all .2s;text-decoration:none;color:inherit;display:block}
+.app-card:hover:not(.disabled){background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.3);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.app-card.disabled{cursor:default;opacity:.5}
+.app-card.active-card{cursor:pointer;border-color:rgba(91,191,255,.4)}
+.card-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px;background:rgba(255,255,255,.15)}
+.card-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:3px}
 .card-desc{font-size:12px;color:rgba(255,255,255,.6);line-height:1.5}
-.card-badge{
-  display:inline-block;font-size:10px;font-weight:700;
-  border-radius:4px;padding:2px 8px;margin-top:10px;
-}
+.card-badge{display:inline-block;font-size:10px;font-weight:700;border-radius:4px;padding:2px 8px;margin-top:8px}
 .badge-active{background:rgba(100,255,200,.2);color:#7dffd0;border:1px solid rgba(100,255,200,.3)}
 .badge-soon{background:rgba(100,180,255,.2);color:#90cbff;border:1px solid rgba(100,180,255,.3)}
 .badge-dev{background:rgba(200,150,255,.2);color:#d4aaff;border:1px solid rgba(200,150,255,.3)}
 
-@media(min-width:860px){
-  .login-brand-area{display:block}
-}
-@media(max-width:600px){
-  .portal-main{padding:20px 16px}
-  .app-grid{grid-template-columns:1fr 1fr}
-  .login-card{padding:36px 28px}
-  .hd-texts .h-sub{display:none}
-}
-@media(max-width:400px){
-  .app-grid{grid-template-columns:1fr}
-}
+/* 掲示板 */
+.notice-list{display:flex;flex-direction:column;gap:12px}
+.notice-item{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:16px 18px;cursor:pointer;transition:background .18s}
+.notice-item:hover{background:rgba(255,255,255,.16)}
+.notice-item.pinned{border-color:rgba(255,200,80,.4);background:rgba(255,200,80,.08)}
+.notice-meta{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.notice-cat{font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px}
+.cat-important{background:rgba(255,80,80,.25);color:#ffaaaa}
+.cat-info{background:rgba(91,191,255,.2);color:#90cbff}
+.cat-training{background:rgba(100,220,150,.2);color:#80e8a8}
+.cat-other{background:rgba(200,200,200,.15);color:rgba(255,255,255,.6)}
+.notice-date{font-size:11px;color:rgba(255,255,255,.45)}
+.notice-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:4px}
+.notice-body-preview{font-size:13px;color:rgba(255,255,255,.6);overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.notice-detail{display:none;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:20px;margin-bottom:16px}
+.notice-detail-body{font-size:14px;color:rgba(255,255,255,.85);line-height:1.8;white-space:pre-wrap;margin-top:12px}
+
+/* アンケート */
+.survey-list{display:flex;flex-direction:column;gap:12px}
+.survey-item{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:16px 18px}
+.survey-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:4px}
+.survey-meta{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:10px}
+.btn-answer{padding:8px 20px;background:linear-gradient(135deg,#5bbfff,#1a72c8);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .18s}
+.btn-answer:hover{opacity:.85}
+.btn-answered{padding:8px 20px;background:rgba(100,255,200,.15);color:#7dffd0;border:1px solid rgba(100,255,200,.3);border-radius:8px;font-size:13px;font-weight:700;cursor:default}
+
+/* 回答フォーム */
+#survey-form-screen{display:none;padding:24px 20px;max-width:700px;margin:0 auto}
+.question-block{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:18px;margin-bottom:14px}
+.question-text{font-size:14px;font-weight:700;color:#fff;margin-bottom:12px}
+.q-option{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;cursor:pointer;transition:background .15s;margin-bottom:4px}
+.q-option:hover{background:rgba(255,255,255,.08)}
+.q-option input[type=radio]{accent-color:#5bbfff;width:16px;height:16px}
+.q-option label{font-size:13px;color:rgba(255,255,255,.85);cursor:pointer}
+.q-textarea{width:100%;padding:10px 12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#fff;font-size:13px;resize:vertical;outline:none;min-height:80px}
+.q-textarea::placeholder{color:rgba(255,255,255,.35)}
+.btn-submit{width:100%;padding:13px;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(220,240,255,.95));color:#0d3a7a;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;transition:opacity .2s;margin-top:8px}
+.btn-submit:hover{opacity:.88}
+
+/* 管理者フォーム */
+.admin-form{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:20px;margin-bottom:20px}
+.admin-form h3{font-size:15px;font-weight:800;color:#fff;margin-bottom:16px}
+.form-row{margin-bottom:14px}
+.form-row label{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.6);margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase}
+.form-input{width:100%;padding:10px 12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#fff;font-size:14px;outline:none}
+.form-input::placeholder{color:rgba(255,255,255,.3)}
+.form-input:focus{border-color:rgba(91,191,255,.6)}
+.form-select{width:100%;padding:10px 12px;background:rgba(10,30,60,.8);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#fff;font-size:14px;outline:none}
+.form-textarea{width:100%;padding:10px 12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#fff;font-size:14px;outline:none;resize:vertical;min-height:100px}
+.form-textarea::placeholder{color:rgba(255,255,255,.3)}
+.btn-primary{padding:10px 24px;background:linear-gradient(135deg,#5bbfff,#1a72c8);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .18s}
+.btn-primary:hover{opacity:.85}
+.btn-danger{padding:7px 14px;background:rgba(255,80,80,.2);color:#ffaaaa;border:1px solid rgba(255,80,80,.3);border-radius:7px;font-size:12px;font-weight:700;cursor:pointer}
+.question-editor{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px;margin-bottom:10px;position:relative}
+.btn-add-q{width:100%;padding:9px;background:rgba(91,191,255,.15);border:1px dashed rgba(91,191,255,.4);color:#90cbff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;margin-top:4px}
+.btn-add-q:hover{background:rgba(91,191,255,.22)}
+
+/* 結果表示 */
+.result-item{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:14px;margin-bottom:10px}
+.result-q{font-size:13px;font-weight:700;color:#fff;margin-bottom:8px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.bar-label{font-size:12px;color:rgba(255,255,255,.7);min-width:100px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-wrap{flex:1;background:rgba(255,255,255,.1);border-radius:4px;height:14px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,#5bbfff,#1a72c8);border-radius:4px;transition:width .4s}
+.bar-count{font-size:11px;color:rgba(255,255,255,.5);min-width:30px;text-align:right}
+
+/* ユーティリティ */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(10,30,60,.92);border:1px solid rgba(91,191,255,.3);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:700;z-index:999;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+.empty-msg{text-align:center;color:rgba(255,255,255,.4);font-size:14px;padding:40px 20px}
+.back-btn{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.6);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:16px;background:none;border:none}
+.back-btn:hover{color:#fff}
+
+@media(min-width:860px){.login-brand-area{display:block}}
+@media(max-width:600px){.screen{padding:16px 14px}.hd-texts .h-sub{display:none}.portal-nav{padding:0 12px}.nav-btn{padding:11px 13px;font-size:12px}}
 </style>
 </head>
 <body>
-
-<!-- 背景 -->
 <div class="bg-layer"></div>
 <svg class="bg-curves" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
   <path d="M-100,600 C200,500 400,750 700,580 S1100,300 1600,450 L1600,900 L-100,900 Z" fill="rgba(255,255,255,0.04)"/>
   <path d="M-100,700 C300,580 500,820 800,660 S1200,380 1600,550 L1600,900 L-100,900 Z" fill="rgba(255,255,255,0.03)"/>
   <path d="M300,-50 C500,100 350,300 550,400 S900,200 1100,350 C1250,460 1350,200 1600,100 L1600,-100 L300,-100 Z" fill="rgba(255,255,255,0.03)"/>
   <ellipse cx="1200" cy="150" rx="400" ry="250" fill="rgba(150,210,255,0.06)" transform="rotate(-15,1200,150)"/>
-  <ellipse cx="200" cy="700" rx="350" ry="200" fill="rgba(255,255,255,0.04)" transform="rotate(10,200,700)"/>
 </svg>
+<div id="loading-screen"><div class="spinner"></div></div>
 
-<!-- ローディング -->
-<div id="loading-screen">
-  <div class="spinner"></div>
-</div>
-
-<!-- ログイン画面 -->
+<!-- ログイン -->
 <div id="login-screen">
   <div class="login-wrap">
     <div class="login-brand-area">
@@ -234,7 +187,7 @@ body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100v
   </div>
 </div>
 
-<!-- ポータル画面 -->
+<!-- ポータル -->
 <div id="portal-screen">
   <header class="portal-header">
     <div class="portal-header-left">
@@ -245,120 +198,516 @@ body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100v
       </div>
     </div>
     <div class="header-right">
-      <span class="user-badge" id="user-email-badge">ログイン中</span>
+      <span class="admin-badge" id="admin-badge" style="display:none">管理者</span>
       <button class="btn-logout" onclick="doLogout()">ログアウト</button>
     </div>
   </header>
 
-  <main class="portal-main">
-    <div class="notice-box">
-      <strong>📢 お知らせ</strong><br>
-      法人内ポータルへようこそ。各アプリは順次公開予定です。
-    </div>
+  <nav class="portal-nav">
+    <button class="nav-btn active" onclick="switchTab('home')">ホーム</button>
+    <button class="nav-btn" onclick="switchTab('notice')">📢 掲示板</button>
+    <button class="nav-btn" onclick="switchTab('survey')">📊 アンケート</button>
+    <button class="nav-btn admin-only" id="admin-nav" style="display:none" onclick="switchTab('admin')">⚙️ 管理</button>
+  </nav>
 
-    <div class="section-title">開発予定</div>
+  <!-- ホーム -->
+  <div class="screen active" id="screen-home">
+    <div style="margin-bottom:20px"></div>
+    <div class="section-label">お知らせ</div>
+    <div id="home-notice-list" style="margin-bottom:28px"></div>
+    <div class="section-label">アプリ</div>
     <div class="app-grid">
-
-      <div class="app-card disabled">
-        <div class="card-icon">📊</div>
-        <div class="card-title">アンケート・ヒアリング</div>
-        <div class="card-desc">従業員へのアンケート作成・QRコード発行・結果グラフ表示</div>
-        <span class="card-badge badge-soon">準備中</span>
+      <div class="app-card active-card" onclick="switchTab('notice')">
+        <div class="card-icon">📢</div>
+        <div class="card-title">掲示板</div>
+        <div class="card-desc">法人からのお知らせ・連絡事項</div>
+        <span class="card-badge badge-active">稼働中</span>
       </div>
-
+      <div class="app-card active-card" onclick="switchTab('survey')">
+        <div class="card-icon">📊</div>
+        <div class="card-title">アンケート</div>
+        <div class="card-desc">従業員ヒアリング・各種アンケート</div>
+        <span class="card-badge badge-active">稼働中</span>
+      </div>
       <div class="app-card disabled">
         <div class="card-icon">📦</div>
         <div class="card-title">備品・物品発注</div>
-        <div class="card-desc">消耗品の在庫申請・発注履歴管理</div>
+        <div class="card-desc">消耗品の在庫申請・発注履歴</div>
         <span class="card-badge badge-soon">準備中</span>
       </div>
-
       <div class="app-card disabled">
         <div class="card-icon">📚</div>
         <div class="card-title">業務マニュアル</div>
         <div class="card-desc">法人内マニュアルの閲覧・検索</div>
         <span class="card-badge badge-soon">準備中</span>
       </div>
-
       <div class="app-card disabled">
         <div class="card-icon">📅</div>
         <div class="card-title">休暇申請</div>
-        <div class="card-desc">有給・各種休暇の申請・承認フロー</div>
+        <div class="card-desc">有給・各種休暇の申請・承認</div>
         <span class="card-badge badge-soon">準備中</span>
       </div>
-
       <div class="app-card disabled">
         <div class="card-icon">💊</div>
         <div class="card-title">加算算定チェッカー</div>
-        <div class="card-desc">2026診療報酬改訂対応・算定要件の確認</div>
+        <div class="card-desc">2026診療報酬改訂対応</div>
         <span class="card-badge badge-dev">企画中</span>
       </div>
-
-      <div class="app-card disabled">
-        <div class="card-icon">⚠️</div>
-        <div class="card-title">ヒヤリハット報告</div>
-        <div class="card-desc">インシデント・ヒヤリハットの報告・集計</div>
-        <span class="card-badge badge-dev">企画中</span>
-      </div>
-
     </div>
     <div style="height:40px"></div>
-  </main>
+  </div>
+
+  <!-- 掲示板 -->
+  <div class="screen" id="screen-notice">
+    <div style="margin-bottom:20px"></div>
+    <div class="section-label">掲示板</div>
+    <div id="notice-list" class="notice-list"><div class="empty-msg">読み込み中...</div></div>
+    <div style="height:40px"></div>
+  </div>
+
+  <!-- アンケート -->
+  <div class="screen" id="screen-survey">
+    <div style="margin-bottom:20px"></div>
+    <div class="section-label">アンケート一覧</div>
+    <div id="survey-list" class="survey-list"><div class="empty-msg">読み込み中...</div></div>
+    <div style="height:40px"></div>
+  </div>
+
+  <!-- 管理 -->
+  <div class="screen" id="screen-admin">
+    <div style="margin-bottom:20px"></div>
+    <!-- 掲示板投稿 -->
+    <div class="admin-form">
+      <h3>📢 掲示板に投稿</h3>
+      <div class="form-row">
+        <label>カテゴリ</label>
+        <select class="form-select" id="n-cat">
+          <option value="important">重要</option>
+          <option value="info" selected>お知らせ</option>
+          <option value="training">研修</option>
+          <option value="other">その他</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>タイトル</label>
+        <input class="form-input" id="n-title" placeholder="タイトルを入力">
+      </div>
+      <div class="form-row">
+        <label>本文</label>
+        <textarea class="form-textarea" id="n-body" placeholder="本文を入力（改行可）"></textarea>
+      </div>
+      <button class="btn-primary" onclick="postNotice()">投稿する</button>
+    </div>
+
+    <!-- 投稿済み一覧 -->
+    <div class="glass-card" style="margin-bottom:20px">
+      <div class="section-label">投稿済みお知らせ</div>
+      <div id="admin-notice-list"></div>
+    </div>
+
+    <!-- アンケート作成 -->
+    <div class="admin-form">
+      <h3>📊 アンケートを作成</h3>
+      <div class="form-row">
+        <label>タイトル</label>
+        <input class="form-input" id="s-title" placeholder="アンケートのタイトル">
+      </div>
+      <div class="form-row">
+        <label>説明（任意）</label>
+        <input class="form-input" id="s-desc" placeholder="アンケートの説明・目的">
+      </div>
+      <div class="form-row">
+        <label>回答期限（任意）</label>
+        <input class="form-input" id="s-deadline" type="date">
+      </div>
+      <div class="section-label" style="margin-top:8px">質問</div>
+      <div id="question-editors"></div>
+      <button class="btn-add-q" onclick="addQuestion()">＋ 質問を追加</button>
+      <div style="height:14px"></div>
+      <button class="btn-primary" onclick="postSurvey()">アンケートを公開</button>
+    </div>
+
+    <!-- アンケート一覧・結果 -->
+    <div class="glass-card">
+      <div class="section-label">公開中のアンケート</div>
+      <div id="admin-survey-list"></div>
+    </div>
+    <div style="height:40px"></div>
+  </div>
 </div>
 
+<!-- 回答フォーム -->
+<div id="survey-form-screen">
+  <button class="back-btn" onclick="closeSurveyForm()">← 一覧に戻る</button>
+  <div id="survey-form-inner"></div>
+  <div style="height:40px"></div>
+</div>
+
+<!-- 結果画面 -->
+<div id="result-screen" style="display:none;padding:24px 20px;max-width:900px;margin:0 auto">
+  <button class="back-btn" onclick="closeResult()">← 管理に戻る</button>
+  <div id="result-inner"></div>
+  <div style="height:40px"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
 <script>
-const FB_CONFIG = {
-  apiKey:'AIzaSyBxXY1aji7J9H0qwrV76VgPxaHJ4wU9E-I',
-  authDomain:'aura-net-portal.firebaseapp.com',
-  projectId:'aura-net-portal',
-  storageBucket:'aura-net-portal.firebasestorage.app',
-  appId:'1:893378399815:web:eff366abc877fc8206ab62'
-};
-const FB_SYS_EMAIL = 'portal@aura-net.local';
-const FB_SYS_PASS  = 'Ap3#Rz7-Mn4Kw';
+const FB_CONFIG={apiKey:'AIzaSyBxXY1aji7J9H0qwrV76VgPxaHJ4wU9E-I',authDomain:'aura-net-portal.firebaseapp.com',projectId:'aura-net-portal',storageBucket:'aura-net-portal.firebasestorage.app',appId:'1:893378399815:web:eff366abc877fc8206ab62'};
+const FB_SYS_EMAIL='portal@aura-net.local';
+const FB_SYS_PASS='Ap3#Rz7-Mn4Kw';
+const ADMIN_PASS='Mng#Au7-Xk3Pq';
 
 firebase.initializeApp(FB_CONFIG);
-const auth = firebase.auth();
+const auth=firebase.auth();
+const db=firebase.firestore();
 
+let isAdmin=false;
+let currentTab='home';
+let questionCount=0;
+let surveyFormData=null;
+
+// ── 画面切替 ──
 function show(id){
-  ['loading-screen','login-screen','portal-screen'].forEach(s=>{
+  ['loading-screen','login-screen','portal-screen','survey-form-screen','result-screen'].forEach(s=>{
     const el=document.getElementById(s);
-    if(s==='loading-screen'){el.style.display=s===id?'flex':'none';}
-    else if(s===id){el.style.display=s==='portal-screen'?'block':'flex';}
-    else{el.style.display='none';}
+    if(!el)return;
+    if(s==='portal-screen') el.style.display=s===id?'block':'none';
+    else el.style.display=s===id?(s==='login-screen'?'flex':'block'):'none';
   });
 }
 
 auth.onAuthStateChanged(user=>{
-  show(user?'portal-screen':'login-screen');
+  if(user){
+    show('portal-screen');
+    loadNotices();
+    loadSurveys();
+    if(isAdmin){
+      document.getElementById('admin-badge').style.display='inline-block';
+      document.getElementById('admin-nav').style.display='inline-block';
+      loadAdminNotices();
+      loadAdminSurveys();
+    }
+  } else {
+    isAdmin=false;
+    show('login-screen');
+  }
 });
 
+// ── ログイン ──
 async function doLogin(){
-  const password=document.getElementById('password').value;
+  const pw=document.getElementById('password').value;
   const errEl=document.getElementById('login-error');
   const btn=document.getElementById('btn-login');
   errEl.style.display='none';
-  if(!password){showErr('アクセスコードを入力してください');return;}
-  if(password!==FB_SYS_PASS){showErr('アクセスコードが正しくありません');return;}
+  if(!pw){showErr('アクセスコードを入力してください');return;}
+  if(pw!==FB_SYS_PASS&&pw!==ADMIN_PASS){showErr('アクセスコードが正しくありません');return;}
+  isAdmin=(pw===ADMIN_PASS);
   btn.disabled=true;btn.textContent='ログイン中...';
   try{
     await auth.signInWithEmailAndPassword(FB_SYS_EMAIL,FB_SYS_PASS);
   }catch(e){
-    showErr(e.code==='auth/too-many-requests'?'試行回数が多すぎます。しばらくお待ちください':'ログインに失敗しました（'+e.code+'）');
-    btn.disabled=false;btn.textContent='ログイン';
+    showErr(e.code==='auth/too-many-requests'?'試行回数が多すぎます':'ログインに失敗しました（'+e.code+'）');
+    btn.disabled=false;btn.textContent='ログイン';isAdmin=false;
   }
-  function showErr(msg){errEl.textContent=msg;errEl.style.display='block';}
+  function showErr(m){errEl.textContent=m;errEl.style.display='block';}
+}
+document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing)doLogin();});
+
+function doLogout(){if(!confirm('ログアウトしますか？'))return;auth.signOut();document.getElementById('password').value='';isAdmin=false;}
+
+// ── タブ切替 ──
+function switchTab(tab){
+  currentTab=tab;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+tab).classList.add('active');
+  document.querySelector(`.nav-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
+  show('portal-screen');
 }
 
-document.getElementById('password').addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&!e.isComposing)doLogin();
-});
+// ── 掲示板 ──
+const CAT_LABELS={important:'重要',info:'お知らせ',training:'研修',other:'その他'};
+const CAT_CSS={important:'cat-important',info:'cat-info',training:'cat-training',other:'cat-other'};
 
-function doLogout(){
-  if(!confirm('ログアウトしますか？'))return;
-  auth.signOut();
-  document.getElementById('password').value='';
+function noticeItemHTML(doc,showDelete=false){
+  const d=doc.data();
+  const date=d.createdAt?new Date(d.createdAt.toDate()).toLocaleDateString('ja-JP'):'';
+  return `<div class="notice-item" onclick="toggleNotice('${doc.id}')">
+    <div class="notice-meta">
+      <span class="notice-cat ${CAT_CSS[d.category]||'cat-other'}">${CAT_LABELS[d.category]||'その他'}</span>
+      <span class="notice-date">${date}</span>
+      ${showDelete?`<button onclick="event.stopPropagation();deleteNotice('${doc.id}')" class="btn-danger" style="margin-left:auto;padding:3px 10px;font-size:11px">削除</button>`:''}
+    </div>
+    <div class="notice-title">${esc(d.title)}</div>
+    <div class="notice-body-preview">${esc(d.body)}</div>
+    <div class="notice-detail" id="nd-${doc.id}">
+      <div class="notice-detail-body">${esc(d.body)}</div>
+    </div>
+  </div>`;
 }
+function toggleNotice(id){
+  const el=document.getElementById('nd-'+id);
+  if(el)el.style.display=el.style.display==='block'?'none':'block';
+}
+
+function loadNotices(){
+  db.collection('notices').orderBy('createdAt','desc').limit(20).onSnapshot(snap=>{
+    const items=snap.docs.map(d=>noticeItemHTML(d)).join('');
+    document.getElementById('notice-list').innerHTML=items||'<div class="empty-msg">お知らせはありません</div>';
+    // ホームに最新3件
+    const latest=snap.docs.slice(0,3).map(d=>noticeItemHTML(d)).join('');
+    document.getElementById('home-notice-list').innerHTML=latest||'<div class="empty-msg" style="padding:16px">お知らせはありません</div>';
+  });
+}
+
+async function postNotice(){
+  const title=document.getElementById('n-title').value.trim();
+  const body=document.getElementById('n-body').value.trim();
+  const cat=document.getElementById('n-cat').value;
+  if(!title||!body){toast('タイトルと本文を入力してください');return;}
+  await db.collection('notices').add({title,body,category:cat,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  document.getElementById('n-title').value='';
+  document.getElementById('n-body').value='';
+  toast('投稿しました ✓');
+  loadAdminNotices();
+}
+
+function loadAdminNotices(){
+  db.collection('notices').orderBy('createdAt','desc').limit(30).get().then(snap=>{
+    const html=snap.docs.map(d=>noticeItemHTML(d,true)).join('');
+    document.getElementById('admin-notice-list').innerHTML=html||'<div class="empty-msg">投稿なし</div>';
+  });
+}
+
+async function deleteNotice(id){
+  if(!confirm('このお知らせを削除しますか？'))return;
+  await db.collection('notices').doc(id).delete();
+  toast('削除しました');
+  loadAdminNotices();
+}
+
+// ── アンケート ──
+function loadSurveys(){
+  db.collection('surveys').where('isActive','==',true).orderBy('createdAt','desc').onSnapshot(snap=>{
+    if(snap.empty){document.getElementById('survey-list').innerHTML='<div class="empty-msg">公開中のアンケートはありません</div>';return;}
+    const html=snap.docs.map(doc=>{
+      const d=doc.data();
+      const deadline=d.deadline?`回答期限：${d.deadline}`:'';
+      const answered=hasAnswered(doc.id);
+      return `<div class="survey-item">
+        <div class="survey-title">${esc(d.title)}</div>
+        <div class="survey-meta">${esc(d.description||'')} ${deadline?'　'+deadline:''}</div>
+        ${answered
+          ?'<span class="btn-answered">✓ 回答済み</span>'
+          :`<button class="btn-answer" onclick="openSurveyForm('${doc.id}')">回答する</button>`}
+      </div>`;
+    }).join('');
+    document.getElementById('survey-list').innerHTML=html;
+  });
+}
+
+function hasAnswered(surveyId){
+  const answered=JSON.parse(localStorage.getItem('answered_surveys')||'[]');
+  return answered.includes(surveyId);
+}
+function markAnswered(surveyId){
+  const answered=JSON.parse(localStorage.getItem('answered_surveys')||'[]');
+  if(!answered.includes(surveyId)){answered.push(surveyId);localStorage.setItem('answered_surveys',JSON.stringify(answered));}
+}
+
+async function openSurveyForm(surveyId){
+  const doc=await db.collection('surveys').doc(surveyId).get();
+  if(!doc.exists)return;
+  surveyFormData={id:surveyId,...doc.data()};
+  const qs=surveyFormData.questions||[];
+  const qHTML=qs.map((q,i)=>{
+    if(q.type==='radio'){
+      const opts=q.options.map((o,j)=>`<div class="q-option"><input type="radio" name="q${i}" id="q${i}o${j}" value="${esc(o)}"><label for="q${i}o${j}">${esc(o)}</label></div>`).join('');
+      return `<div class="question-block"><div class="question-text">${i+1}. ${esc(q.text)}</div>${opts}</div>`;
+    }
+    return `<div class="question-block"><div class="question-text">${i+1}. ${esc(q.text)}</div><textarea class="q-textarea" id="qt${i}" placeholder="回答を入力"></textarea></div>`;
+  }).join('');
+  document.getElementById('survey-form-inner').innerHTML=`
+    <div class="glass-card" style="margin-bottom:20px">
+      <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:6px">${esc(surveyFormData.title)}</div>
+      ${surveyFormData.description?`<div style="font-size:13px;color:rgba(255,255,255,.6)">${esc(surveyFormData.description)}</div>`:''}
+    </div>
+    ${qHTML}
+    <button class="btn-submit" onclick="submitSurvey('${surveyId}')">回答を送信する</button>`;
+  document.getElementById('portal-screen').style.display='none';
+  document.getElementById('survey-form-screen').style.display='block';
+}
+
+function closeSurveyForm(){
+  document.getElementById('survey-form-screen').style.display='none';
+  show('portal-screen');
+  switchTab('survey');
+}
+
+async function submitSurvey(surveyId){
+  const qs=surveyFormData.questions||[];
+  const answers=qs.map((q,i)=>{
+    if(q.type==='radio'){
+      const sel=document.querySelector(`input[name="q${i}"]:checked`);
+      return{question:q.text,type:'radio',answer:sel?sel.value:''};
+    }
+    const el=document.getElementById('qt'+i);
+    return{question:q.text,type:'text',answer:el?el.value.trim():''};
+  });
+  await db.collection('responses').add({surveyId,answers,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  markAnswered(surveyId);
+  toast('回答を送信しました ✓');
+  closeSurveyForm();
+}
+
+// ── アンケート作成 ──
+function addQuestion(){
+  const i=questionCount++;
+  const div=document.createElement('div');
+  div.className='question-editor';
+  div.id='qe'+i;
+  div.innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <span style="font-size:13px;font-weight:700;color:rgba(255,255,255,.7)">質問 ${i+1}</span>
+      <select class="form-select" id="qt${i}" style="width:120px;padding:4px 8px" onchange="renderQEditor(${i})">
+        <option value="radio">選択式</option>
+        <option value="text">記述式</option>
+      </select>
+      <button class="btn-danger" onclick="removeQuestion(${i})" style="margin-left:auto">削除</button>
+    </div>
+    <div class="form-row"><input class="form-input" id="qtxt${i}" placeholder="質問文を入力"></div>
+    <div id="qopts${i}">
+      <div class="form-row" style="margin-bottom:6px"><input class="form-input" id="qo${i}_0" placeholder="選択肢 1"></div>
+      <div class="form-row" style="margin-bottom:6px"><input class="form-input" id="qo${i}_1" placeholder="選択肢 2"></div>
+      <button class="btn-add-q" onclick="addOption(${i})" style="padding:5px;font-size:11px">＋ 選択肢を追加</button>
+    </div>`;
+  document.getElementById('question-editors').appendChild(div);
+}
+
+function renderQEditor(i){
+  const type=document.getElementById('qt'+i).value;
+  const optsEl=document.getElementById('qopts'+i);
+  if(type==='text'){optsEl.innerHTML='<div style="font-size:12px;color:rgba(255,255,255,.4)">自由記述欄が表示されます</div>';}
+  else{optsEl.innerHTML=`<div class="form-row" style="margin-bottom:6px"><input class="form-input" id="qo${i}_0" placeholder="選択肢 1"></div><div class="form-row" style="margin-bottom:6px"><input class="form-input" id="qo${i}_1" placeholder="選択肢 2"></div><button class="btn-add-q" onclick="addOption(${i})" style="padding:5px;font-size:11px">＋ 選択肢を追加</button>`;}
+}
+
+let optCounts={};
+function addOption(qi){
+  if(!optCounts[qi])optCounts[qi]=2;
+  const idx=optCounts[qi]++;
+  const optsEl=document.getElementById('qopts'+qi);
+  const btn=optsEl.querySelector('.btn-add-q');
+  const div=document.createElement('div');
+  div.className='form-row';div.style.marginBottom='6px';
+  div.innerHTML=`<input class="form-input" id="qo${qi}_${idx}" placeholder="選択肢 ${idx+1}">`;
+  optsEl.insertBefore(div,btn);
+}
+
+function removeQuestion(i){document.getElementById('qe'+i).remove();}
+
+async function postSurvey(){
+  const title=document.getElementById('s-title').value.trim();
+  const desc=document.getElementById('s-desc').value.trim();
+  const deadline=document.getElementById('s-deadline').value;
+  if(!title){toast('タイトルを入力してください');return;}
+  const editors=document.querySelectorAll('.question-editor');
+  if(!editors.length){toast('質問を1つ以上追加してください');return;}
+  const questions=[];
+  for(const ed of editors){
+    const idx=ed.id.replace('qe','');
+    const type=document.getElementById('qt'+idx).value;
+    const text=document.getElementById('qtxt'+idx).value.trim();
+    if(!text)continue;
+    if(type==='radio'){
+      const options=[];
+      let j=0;while(true){const el=document.getElementById(`qo${idx}_${j}`);if(!el)break;if(el.value.trim())options.push(el.value.trim());j++;}
+      if(options.length<2){toast('選択肢は2つ以上必要です');return;}
+      questions.push({type:'radio',text,options});
+    } else {
+      questions.push({type:'text',text});
+    }
+  }
+  if(!questions.length){toast('有効な質問がありません');return;}
+  await db.collection('surveys').add({title,description:desc,deadline,questions,isActive:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  document.getElementById('s-title').value='';
+  document.getElementById('s-desc').value='';
+  document.getElementById('s-deadline').value='';
+  document.getElementById('question-editors').innerHTML='';
+  questionCount=0;optCounts={};
+  toast('アンケートを公開しました ✓');
+  loadAdminSurveys();
+}
+
+function loadAdminSurveys(){
+  db.collection('surveys').orderBy('createdAt','desc').get().then(snap=>{
+    const html=snap.docs.map(doc=>{
+      const d=doc.data();
+      return `<div style="background:rgba(255,255,255,.07);border-radius:10px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:700;color:#fff">${esc(d.title)}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.45)">${d.isActive?'公開中':'終了'}</div>
+        </div>
+        <button class="btn-primary" style="font-size:12px;padding:6px 14px" onclick="showResult('${doc.id}')">結果を見る</button>
+        <button class="btn-danger" onclick="closeSurveyAdmin('${doc.id}','${esc(d.title)}',${d.isActive})">${d.isActive?'終了する':'再公開'}</button>
+      </div>`;
+    }).join('');
+    document.getElementById('admin-survey-list').innerHTML=html||'<div class="empty-msg">アンケートなし</div>';
+  });
+}
+
+async function closeSurveyAdmin(id,title,isActive){
+  const msg=isActive?`「${title}」を終了しますか？`:`「${title}」を再公開しますか？`;
+  if(!confirm(msg))return;
+  await db.collection('surveys').doc(id).update({isActive:!isActive});
+  toast(isActive?'アンケートを終了しました':'再公開しました');
+  loadAdminSurveys();
+}
+
+async function showResult(surveyId){
+  const [surveyDoc,responsesSnap]=await Promise.all([
+    db.collection('surveys').doc(surveyId).get(),
+    db.collection('responses').where('surveyId','==',surveyId).get()
+  ]);
+  const survey=surveyDoc.data();
+  const responses=responsesSnap.docs.map(d=>d.data());
+  const total=responses.length;
+  let html=`<div class="glass-card" style="margin-bottom:20px">
+    <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:4px">${esc(survey.title)}</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.5)">回答数：${total}件</div>
+  </div>`;
+  (survey.questions||[]).forEach((q,qi)=>{
+    html+=`<div class="result-item"><div class="result-q">Q${qi+1}. ${esc(q.text)}</div>`;
+    if(q.type==='radio'){
+      const counts={};
+      q.options.forEach(o=>{counts[o]=0;});
+      responses.forEach(r=>{const a=r.answers[qi];if(a&&a.answer)counts[a.answer]=(counts[a.answer]||0)+1;});
+      q.options.forEach(o=>{
+        const c=counts[o]||0;
+        const pct=total>0?Math.round(c/total*100):0;
+        html+=`<div class="bar-row"><span class="bar-label">${esc(o)}</span><div class="bar-wrap"><div class="bar-fill" style="width:${pct}%"></div></div><span class="bar-count">${c}件</span></div>`;
+      });
+    } else {
+      const texts=responses.map(r=>r.answers[qi]?.answer).filter(Boolean);
+      html+=texts.map(t=>`<div style="background:rgba(255,255,255,.07);border-radius:7px;padding:8px 12px;margin-bottom:6px;font-size:13px;color:rgba(255,255,255,.8)">${esc(t)}</div>`).join('')||'<div style="color:rgba(255,255,255,.35);font-size:13px">回答なし</div>';
+    }
+    html+='</div>';
+  });
+  document.getElementById('result-inner').innerHTML=html;
+  document.getElementById('portal-screen').style.display='none';
+  document.getElementById('result-screen').style.display='block';
+}
+
+function closeResult(){
+  document.getElementById('result-screen').style.display='none';
+  show('portal-screen');
+  switchTab('admin');
+}
+
+// ── ユーティリティ ──
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+let toastTimer;
+function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2500);}
 </script>
 </body>
 </html>
