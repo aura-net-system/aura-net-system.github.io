@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AURA NET 法人内ポータル</title>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;background:#f0f4f8;min-height:100vh;color:#1a202c}
+
+/* ── ログイン画面 ── */
+#login-screen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;padding:20px;
+}
+.login-card{
+  background:#fff;border-radius:16px;padding:40px 36px;
+  width:100%;max-width:400px;
+  box-shadow:0 4px 24px rgba(0,0,0,.10);
+}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo .logo-icon{
+  width:64px;height:64px;border-radius:16px;
+  background:linear-gradient(135deg,#2b6cb0,#2c7a7b);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:28px;margin-bottom:12px;
+}
+.login-logo h1{font-size:20px;font-weight:700;color:#1a202c}
+.login-logo p{font-size:13px;color:#718096;margin-top:4px}
+.login-card label{display:block;font-size:13px;font-weight:600;color:#4a5568;margin-bottom:6px}
+.login-card input{
+  width:100%;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;
+  font-size:15px;outline:none;transition:border .2s;
+  margin-bottom:16px;
+}
+.login-card input:focus{border-color:#2b6cb0}
+.btn-login{
+  width:100%;padding:12px;background:linear-gradient(135deg,#2b6cb0,#2c7a7b);
+  color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;
+  cursor:pointer;transition:opacity .2s;
+}
+.btn-login:hover{opacity:.88}
+.btn-login:disabled{opacity:.5;cursor:not-allowed}
+#login-error{
+  display:none;background:#fff5f5;border:1px solid #fc8181;
+  color:#c53030;border-radius:8px;padding:10px 14px;
+  font-size:13px;margin-top:12px;
+}
+
+/* ── ポータル画面 ── */
+#portal-screen{display:none;min-height:100vh}
+
+/* ヘッダー */
+.portal-header{
+  background:linear-gradient(135deg,#2b6cb0,#2c7a7b);
+  color:#fff;padding:0 24px;height:60px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+}
+.portal-header-left{display:flex;align-items:center;gap:12px}
+.portal-header-left .h-icon{font-size:22px}
+.portal-header-left .h-title{font-size:17px;font-weight:700}
+.portal-header-left .h-sub{font-size:11px;opacity:.8;margin-top:1px}
+.header-right{display:flex;align-items:center;gap:12px}
+.user-badge{
+  background:rgba(255,255,255,.15);border-radius:20px;
+  padding:4px 12px;font-size:12px;
+}
+.btn-logout{
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+  color:#fff;border-radius:8px;padding:6px 14px;font-size:13px;
+  cursor:pointer;transition:background .2s;
+}
+.btn-logout:hover{background:rgba(255,255,255,.28)}
+
+/* メインコンテンツ */
+.portal-main{padding:28px 24px;max-width:1100px;margin:0 auto}
+.section-title{
+  font-size:13px;font-weight:700;color:#718096;
+  letter-spacing:.05em;text-transform:uppercase;
+  margin-bottom:16px;margin-top:32px;
+}
+.section-title:first-child{margin-top:0}
+
+/* アプリカードグリッド */
+.app-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:16px;
+}
+.app-card{
+  background:#fff;border-radius:14px;padding:22px 20px;
+  box-shadow:0 1px 6px rgba(0,0,0,.07);
+  border:1.5px solid transparent;
+  cursor:pointer;transition:all .2s;
+  text-decoration:none;color:inherit;
+  display:block;
+}
+.app-card:hover:not(.disabled){
+  border-color:#2b6cb0;
+  box-shadow:0 4px 16px rgba(43,108,176,.15);
+  transform:translateY(-2px);
+}
+.app-card.disabled{cursor:default;opacity:.6}
+.card-icon{
+  width:48px;height:48px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;margin-bottom:14px;
+}
+.card-title{font-size:15px;font-weight:700;color:#2d3748;margin-bottom:4px}
+.card-desc{font-size:12px;color:#718096;line-height:1.5}
+.card-badge{
+  display:inline-block;font-size:10px;font-weight:700;
+  border-radius:4px;padding:2px 7px;margin-top:8px;
+}
+.badge-active{background:#e6fffa;color:#2c7a7b}
+.badge-soon{background:#ebf8ff;color:#2b6cb0}
+.badge-dev{background:#faf5ff;color:#6b46c1}
+
+/* お知らせエリア */
+.notice-box{
+  background:#ebf8ff;border:1.5px solid #bee3f8;
+  border-radius:12px;padding:16px 18px;
+  font-size:13px;color:#2c5282;line-height:1.6;
+}
+.notice-box strong{font-weight:700}
+
+/* ローディング */
+#loading-screen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;flex-direction:column;gap:16px;
+}
+.spinner{
+  width:40px;height:40px;border:3px solid #e2e8f0;
+  border-top-color:#2b6cb0;border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* レスポンシブ */
+@media(max-width:600px){
+  .portal-main{padding:20px 16px}
+  .app-grid{grid-template-columns:1fr 1fr}
+  .portal-header-left .h-sub{display:none}
+}
+@media(max-width:400px){
+  .app-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ローディング -->
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <p style="font-size:13px;color:#718096">読み込み中...</p>
+</div>
+
+<!-- ログイン画面 -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">🏥</div>
+      <h1>AURA NET</h1>
+      <p>法人内ポータルへログイン</p>
+    </div>
+    <label>アクセスコード</label>
+    <input type="password" id="password" placeholder="アクセスコードを入力" autocomplete="current-password">
+    <button class="btn-login" id="btn-login" onclick="doLogin()">ログイン</button>
+    <div id="login-error"></div>
+  </div>
+</div>
+
+<!-- ポータル画面 -->
+<div id="portal-screen">
+
+  <!-- ヘッダー -->
+  <header class="portal-header">
+    <div class="portal-header-left">
+      <span class="h-icon">🏥</span>
+      <div>
+        <div class="h-title">AURA NET ポータル</div>
+        <div class="h-sub">医療福祉法人 業務支援システム</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="user-badge" id="user-email-badge">---</span>
+      <button class="btn-logout" onclick="doLogout()">ログアウト</button>
+    </div>
+  </header>
+
+  <!-- メインコンテンツ -->
+  <main class="portal-main">
+
+    <!-- お知らせ -->
+    <div class="notice-box" id="notice-box">
+      <strong>📢 お知らせ</strong><br>
+      法人内ポータルへようこそ。各アプリは下のカードからアクセスできます。
+      準備中のアプリは順次公開予定です。
+    </div>
+
+    <!-- 稼働中のアプリ -->
+    <div class="section-title">稼働中</div>
+    <div class="app-grid">
+
+      <a class="app-card" href="https://tinada1988-glacias.github.io/care-karte-demo/" target="_blank">
+        <div class="card-icon" style="background:#e6fffa">📋</div>
+        <div class="card-title">施設カルテシステム</div>
+        <div class="card-desc">利用者記録・フェイスシート・業務日誌の管理</div>
+        <span class="card-badge badge-active">稼働中</span>
+      </a>
+
+    </div>
+
+    <!-- 開発予定のアプリ -->
+    <div class="section-title">開発予定</div>
+    <div class="app-grid">
+
+      <div class="app-card disabled">
+        <div class="card-icon" style="background:#fef3c7">📊</div>
+        <div class="card-title">アンケート・ヒアリング</div>
+        <div class="card-desc">従業員へのアンケート作成・QRコード発行・結果グラフ表示</div>
+        <span class="card-badge badge-soon">準備中</span>
+      </div>
+
+      <div class="app-card disabled">
+        <div class="card-icon" style="background:#ebf8ff">📦</div>
+        <div class="card-title">備品・物品発注</div>
+        <div class="card-desc">消耗品の在庫申請・発注履歴管理</div>
+        <span class="card-badge badge-soon">準備中</span>
+      </div>
+
+      <div class="app-card disabled">
+        <div class="card-icon" style="background:#faf5ff">📚</div>
+        <div class="card-title">業務マニュアル</div>
+        <div class="card-desc">法人内マニュアルの閲覧・検索</div>
+        <span class="card-badge badge-soon">準備中</span>
+      </div>
+
+      <div class="app-card disabled">
+        <div class="card-icon" style="background:#fff5f5">📅</div>
+        <div class="card-title">休暇申請</div>
+        <div class="card-desc">有給・各種休暇の申請・承認フロー</div>
+        <span class="card-badge badge-soon">準備中</span>
+      </div>
+
+      <div class="app-card disabled">
+        <div class="card-icon" style="background:#f0fff4">💊</div>
+        <div class="card-title">加算算定チェッカー</div>
+        <div class="card-desc">2026診療報酬改訂対応・算定要件の確認</div>
+        <span class="card-badge badge-dev">企画中</span>
+      </div>
+
+      <div class="app-card disabled">
+        <div class="card-icon" style="background:#fffaf0">⚠️</div>
+        <div class="card-title">ヒヤリハット報告</div>
+        <div class="card-desc">インシデント・ヒヤリハットの報告・集計</div>
+        <span class="card-badge badge-dev">企画中</span>
+      </div>
+
+    </div>
+
+    <div style="height:40px"></div>
+  </main>
+</div>
+
+<script>
+// ── Firebase設定（village-aura プロジェクト） ──
+const FB_CONFIG = {
+  apiKey:'AIzaSyBOU4Z48gIhbndtRSKiTH8fcQAjlKgncD8',
+  authDomain:'village-aura.firebaseapp.com',
+  projectId:'village-aura',
+  storageBucket:'village-aura.firebasestorage.app',
+  appId:'1:559931440710:web:c8f37e31163ba229501447'
+};
+// reCAPTCHA Enterprise サイトキー（ポータル公開時はポータルドメイン用のキーに差し替える）
+const RECAPTCHA_KEY = '6LcastgsAAAAAHFjkxmkwvQ2n_-rmKqDfIpSqjCB';
+// 共通アカウント（カルテと同じ village-aura プロジェクトのシステムアカウント）
+const FB_SYS_EMAIL = 'facility@village-aura.local';
+const FB_SYS_PASS  = 'Vp7#Xm2-Lq9Kz';
+
+// ── 初期化 ──
+firebase.initializeApp(FB_CONFIG);
+// ローカル（file://）ではApp Checkをスキップ・公開後は有効になる
+if(location.protocol !== 'file:'){
+  firebase.appCheck().activate(
+    new firebase.appCheck.ReCaptchaEnterpriseProvider(RECAPTCHA_KEY),
+    true
+  );
+}
+const auth = firebase.auth();
+
+// ── 画面切替 ──
+function show(id){
+  ['loading-screen','login-screen','portal-screen'].forEach(s=>{
+    document.getElementById(s).style.display = s===id ? 'flex' : 'none';
+  });
+  if(id==='portal-screen') document.getElementById('portal-screen').style.display='block';
+}
+
+// ── 認証状態の監視 ──
+auth.onAuthStateChanged(user=>{
+  if(user){
+    document.getElementById('user-email-badge').textContent = 'ログイン中';
+    show('portal-screen');
+  } else {
+    show('login-screen');
+  }
+});
+
+// ── ログイン ──
+async function doLogin(){
+  const password = document.getElementById('password').value;
+  const errEl    = document.getElementById('login-error');
+  const btn      = document.getElementById('btn-login');
+  errEl.style.display = 'none';
+  if(!password){ showErr('アクセスコードを入力してください'); return; }
+  if(password !== FB_SYS_PASS){ showErr('アクセスコードが正しくありません'); return; }
+  btn.disabled = true; btn.textContent = 'ログイン中...';
+  try{
+    await auth.signInWithEmailAndPassword(FB_SYS_EMAIL, FB_SYS_PASS);
+  } catch(e){
+    const msgs = {
+      'auth/too-many-requests':'試行回数が多すぎます。しばらくお待ちください',
+    };
+    showErr(msgs[e.code]||'ログインに失敗しました（'+e.code+'）');
+    btn.disabled = false; btn.textContent = 'ログイン';
+  }
+  function showErr(msg){ errEl.textContent=msg; errEl.style.display='block'; }
+}
+
+// Enterキーでログイン
+document.getElementById('password').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.isComposing) doLogin();
+});
+
+// ── ログアウト ──
+function doLogout(){
+  if(!confirm('ログアウトしますか？')) return;
+  auth.signOut();
+  document.getElementById('password').value='';
+}
+</script>
+</body>
+</html>
