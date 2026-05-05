@@ -489,9 +489,10 @@ async function deleteNotice(id){
 
 // ── アンケート ──
 function loadSurveys(){
-  db.collection('surveys').where('isActive','==',true).orderBy('createdAt','desc').onSnapshot(snap=>{
-    if(snap.empty){document.getElementById('survey-list').innerHTML='<div class="empty-msg">公開中のアンケートはありません</div>';return;}
-    const html=snap.docs.map(doc=>{
+  db.collection('surveys').orderBy('createdAt','desc').onSnapshot(snap=>{
+    const activeDocs=snap.docs.filter(d=>d.data().isActive===true);
+    if(!activeDocs.length){document.getElementById('survey-list').innerHTML='<div class="empty-msg">公開中のアンケートはありません</div>';return;}
+    const html=activeDocs.map(doc=>{
       const d=doc.data();
       const deadline=d.deadline?`回答期限：${d.deadline}`:'';
       const answered=hasAnswered(doc.id);
