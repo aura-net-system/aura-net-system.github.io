@@ -152,6 +152,19 @@ body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100v
 .back-btn{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.6);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:16px;background:none;border:none}
 .back-btn:hover{color:#fff}
 
+/* ありがとうBOX */
+.thanks-card{background:rgba(255,255,255,.1);border:1px solid rgba(255,150,150,.2);border-radius:14px;padding:16px 18px;margin-bottom:12px}
+.thanks-card .th-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.thanks-heart{font-size:18px}
+.thanks-to{font-size:14px;font-weight:800;color:#fff}
+.thanks-from{font-size:12px;color:rgba(255,255,255,.5)}
+.thanks-cats{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.thanks-cat{font-size:11px;font-weight:700;background:rgba(255,150,150,.2);color:#ffaaaa;border-radius:4px;padding:2px 8px}
+.thanks-episode{font-size:13px;color:rgba(255,255,255,.8);line-height:1.7}
+.th-cat-item{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:6px 12px;font-size:12px;color:rgba(255,255,255,.8);cursor:pointer;transition:background .15s}
+.th-cat-item:hover{background:rgba(255,150,150,.15)}
+.th-cat-item input{accent-color:#ff8080;width:14px;height:14px}
+
 @media(min-width:860px){.login-brand-area{display:block}}
 @media(max-width:600px){.screen{padding:16px 14px}.hd-texts .h-sub{display:none}.portal-nav{padding:0 12px}.nav-btn{padding:11px 13px;font-size:12px}}
 </style>
@@ -207,6 +220,7 @@ body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100v
     <button class="nav-btn active" onclick="switchTab('home')">ホーム</button>
     <button class="nav-btn" onclick="switchTab('notice')">📢 掲示板</button>
     <button class="nav-btn" onclick="switchTab('survey')">📊 アンケート</button>
+    <button class="nav-btn" onclick="switchTab('thanks')">❤️ ありがとう</button>
     <button class="nav-btn admin-only" id="admin-nav" style="display:none" onclick="switchTab('admin')">⚙️ 管理</button>
   </nav>
 
@@ -227,6 +241,12 @@ body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100v
         <div class="card-icon">📊</div>
         <div class="card-title">アンケート</div>
         <div class="card-desc">従業員ヒアリング・各種アンケート</div>
+        <span class="card-badge badge-active">稼働中</span>
+      </div>
+      <div class="app-card active-card" onclick="switchTab('thanks')">
+        <div class="card-icon">❤️</div>
+        <div class="card-title">ありがとうBOX</div>
+        <div class="card-desc">日頃の感謝をみんなで共有する</div>
         <span class="card-badge badge-active">稼働中</span>
       </div>
       <div class="app-card disabled">
@@ -271,6 +291,88 @@ body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100v
     <div class="section-label">アンケート一覧</div>
     <div id="survey-list" class="survey-list"><div class="empty-msg">読み込み中...</div></div>
     <div style="height:40px"></div>
+  </div>
+
+  <!-- ありがとうBOX -->
+  <div class="screen" id="screen-thanks">
+    <div style="margin-bottom:20px"></div>
+    <div style="background:rgba(255,150,150,.08);border:1px solid rgba(255,150,150,.2);border-radius:14px;padding:16px 18px;margin-bottom:20px;font-size:13px;color:rgba(255,255,255,.8);line-height:1.7">
+      ❤️ <strong style="color:#fff">みんなのありがとうBOX</strong><br>
+      日頃の業務の中で「ありがとう」と感じた瞬間を気軽に共有できます。<br>
+      ちょっとした助け合い、声かけ、連携の良さなど、誰かの良い行動をみんなで広げましょう。
+    </div>
+    <button class="btn-primary" style="width:100%;padding:13px;font-size:15px;margin-bottom:20px" onclick="switchTab('thanks-form')">❤️ ありがとうを投稿する</button>
+    <div class="section-label">みんなのありがとう</div>
+    <div id="thanks-list"><div class="empty-msg">読み込み中...</div></div>
+    <div style="height:40px"></div>
+  </div>
+
+  <!-- ありがとう投稿フォーム -->
+  <div class="screen" id="screen-thanks-form">
+    <div style="margin-bottom:20px"></div>
+    <button class="back-btn" onclick="switchTab('thanks')">← 一覧に戻る</button>
+    <div class="admin-form">
+      <h3>❤️ ありがとうを投稿する</h3>
+      <div class="form-row">
+        <label>あなたの名前（匿名の場合は「匿名」と入力）</label>
+        <input class="form-input" id="th-sender" placeholder="匿名" value="匿名">
+      </div>
+      <div class="form-row">
+        <label>あなたの所属部門</label>
+        <select class="form-select" id="th-sender-dept">
+          <option>医院（居宅）</option>
+          <option>小規模多機能型居宅介護</option>
+          <option>サービス付き高齢者向け住宅</option>
+          <option>法人本部</option>
+          <option>その他</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>ありがとうを伝えたい相手（呼称・ニックネーム可）</label>
+        <input class="form-input" id="th-to" placeholder="例：柏原さん、夜勤チームの皆さん">
+      </div>
+      <div class="form-row">
+        <label>相手の所属部門</label>
+        <select class="form-select" id="th-to-dept">
+          <option>医院（居宅）</option>
+          <option>小規模多機能型居宅介護</option>
+          <option>サービス付き高齢者向け住宅</option>
+          <option>法人本部</option>
+          <option>その他</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>どんな時のありがとう？（複数選択可）</label>
+        <div id="th-cats" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px">
+          <label class="th-cat-item"><input type="checkbox" value="困った時に助けてくれた"> 困った時に助けてくれた</label>
+          <label class="th-cat-item"><input type="checkbox" value="仕事を丁寧に教えてくれた"> 仕事を丁寧に教えてくれた</label>
+          <label class="th-cat-item"><input type="checkbox" value="忙しい時にフォローしてくれた"> 忙しい時にフォローしてくれた</label>
+          <label class="th-cat-item"><input type="checkbox" value="良い気づきをくれた"> 良い気づきをくれた</label>
+          <label class="th-cat-item"><input type="checkbox" value="ミスをカバーしてくれた"> ミスをカバーしてくれた</label>
+          <label class="th-cat-item"><input type="checkbox" value="励ましてくれた"> 励ましてくれた</label>
+          <label class="th-cat-item"><input type="checkbox" value="話を聞いてくれた"> 話を聞いてくれた</label>
+          <label class="th-cat-item"><input type="checkbox" value="部門間の連携がスムーズだった"> 部門間の連携がスムーズだった</label>
+          <label class="th-cat-item"><input type="checkbox" value="その他"> その他</label>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>エピソード（できるだけ具体的に）</label>
+        <textarea class="form-textarea" id="th-episode" placeholder="例：昨夜の夜勤の際、隙間時間でエアコン掃除を自発的にしてくれていた。他の人が気づかない部分の気遣いができていて素晴らしいと感じました。"></textarea>
+      </div>
+      <div class="form-row">
+        <label>公開についての希望</label>
+        <select class="form-select" id="th-visibility">
+          <option value="public">朝礼・共有チャットなどで共有して良い</option>
+          <option value="anonymous" selected>匿名化すれば共有して良い</option>
+          <option value="private">公開はしないでほしい</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>備考（任意）</label>
+        <input class="form-input" id="th-note" placeholder="任意">
+      </div>
+      <button class="btn-primary" style="width:100%;padding:13px" onclick="postThanks()">投稿する</button>
+    </div>
   </div>
 
   <!-- 管理 -->
@@ -382,6 +484,7 @@ auth.onAuthStateChanged(user=>{
     show('portal-screen');
     loadNotices();
     loadSurveys();
+    loadThanks();
     if(isAdmin){
       document.getElementById('admin-badge').style.display='inline-block';
       document.getElementById('admin-nav').style.display='inline-block';
@@ -421,8 +524,13 @@ function switchTab(tab){
   currentTab=tab;
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('screen-'+tab).classList.add('active');
-  document.querySelector(`.nav-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
+  const screen=document.getElementById('screen-'+tab);
+  if(screen) screen.classList.add('active');
+  const navBtn=document.querySelector(`.nav-btn[onclick="switchTab('${tab}')"]`);
+  // thanks-form は thanks タブをアクティブにする
+  const activeTab=tab==='thanks-form'?'thanks':tab;
+  const activeBtn=document.querySelector(`.nav-btn[onclick="switchTab('${activeTab}')"]`);
+  if(activeBtn) activeBtn.classList.add('active');
   show('portal-screen');
 }
 
@@ -703,6 +811,63 @@ function closeResult(){
   document.getElementById('result-screen').style.display='none';
   show('portal-screen');
   switchTab('admin');
+}
+
+// ── ありがとうBOX ──
+function loadThanks(){
+  db.collection('thanks_box').orderBy('createdAt','desc').limit(50).onSnapshot(snap=>{
+    if(snap.empty){document.getElementById('thanks-list').innerHTML='<div class="empty-msg">まだ投稿がありません</div>';return;}
+    const html=snap.docs.map(doc=>{
+      const d=doc.data();
+      if(d.visibility==='private'&&!isAdmin) return '';
+      const cats=(d.categories||[]).map(c=>`<span class="thanks-cat">${esc(c)}</span>`).join('');
+      const date=d.createdAt?new Date(d.createdAt.toDate()).toLocaleDateString('ja-JP'):'';
+      const senderLabel=d.visibility==='anonymous'&&!isAdmin?`${esc(d.senderDept||'')}のスタッフ`:esc(d.senderName||'匿名');
+      const privateLabel=d.visibility==='private'?'<span style="font-size:10px;background:rgba(255,80,80,.2);color:#ffaaaa;border-radius:4px;padding:1px 6px;margin-left:6px">非公開</span>':'';
+      const delBtn=isAdmin?`<button onclick="deleteThanks('${doc.id}')" class="btn-danger" style="padding:3px 10px;font-size:11px;margin-left:auto">削除</button>`:'';
+      return `<div class="thanks-card">
+        <div class="th-header">
+          <span class="thanks-heart">❤️</span>
+          <span class="thanks-to">${esc(d.toName||'')} さんへ</span>
+          <span style="font-size:11px;color:rgba(255,255,255,.35)">${esc(d.toDept||'')}</span>
+          ${privateLabel}${delBtn}
+        </div>
+        <div class="thanks-cats">${cats}</div>
+        <div class="thanks-episode">${esc(d.episode||'')}</div>
+        <div style="margin-top:8px;font-size:11px;color:rgba(255,255,255,.4)">${senderLabel}　${date}</div>
+      </div>`;
+    }).filter(Boolean).join('');
+    document.getElementById('thanks-list').innerHTML=html||'<div class="empty-msg">表示できる投稿がありません</div>';
+  });
+}
+
+async function postThanks(){
+  const sender=document.getElementById('th-sender').value.trim()||'匿名';
+  const senderDept=document.getElementById('th-sender-dept').value;
+  const toName=document.getElementById('th-to').value.trim();
+  const toDept=document.getElementById('th-to-dept').value;
+  const episode=document.getElementById('th-episode').value.trim();
+  const visibility=document.getElementById('th-visibility').value;
+  const note=document.getElementById('th-note').value.trim();
+  const categories=[...document.querySelectorAll('#th-cats input:checked')].map(el=>el.value);
+  if(!toName){toast('相手の名前・呼称を入力してください');return;}
+  if(!episode){toast('エピソードを入力してください');return;}
+  if(!categories.length){toast('「どんな時のありがとう」を選択してください');return;}
+  await db.collection('thanks_box').add({senderName:sender,senderDept,toName,toDept,episode,visibility,note,categories,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+  // フォームリセット
+  document.getElementById('th-sender').value='匿名';
+  document.getElementById('th-to').value='';
+  document.getElementById('th-episode').value='';
+  document.getElementById('th-note').value='';
+  document.querySelectorAll('#th-cats input').forEach(el=>el.checked=false);
+  toast('投稿しました ❤️');
+  switchTab('thanks');
+}
+
+async function deleteThanks(id){
+  if(!confirm('この投稿を削除しますか？'))return;
+  await db.collection('thanks_box').doc(id).delete();
+  toast('削除しました');
 }
 
 // ── ユーティリティ ──
