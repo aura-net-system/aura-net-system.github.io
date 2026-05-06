@@ -207,9 +207,15 @@ body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100v
           <input class="form-input" id="f-due" type="date">
         </div>
       </div>
-      <div class="form-row" style="margin-top:18px">
-        <label>購入先候補（任意）</label>
-        <input class="form-input" id="f-supplier" placeholder="例：アスクル、Amazon、近隣薬局">
+      <div class="row2" style="margin-top:18px">
+        <div class="form-row">
+          <label>購入先候補（任意）</label>
+          <input class="form-input" id="f-supplier" placeholder="例：アスクル、Amazon">
+        </div>
+        <div class="form-row">
+          <label>商品リンク（任意）</label>
+          <input class="form-input" id="f-url" type="url" placeholder="https://...">
+        </div>
       </div>
       <div class="form-row">
         <label>理由・用途<span class="req">*</span></label>
@@ -383,6 +389,7 @@ const URG={
 };
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function isSafeUrl(s){try{const u=new URL(s);return u.protocol==='https:'||u.protocol==='http:';}catch{return false;}}
 
 function orderCard(doc,adminMode){
   const d=doc.data();
@@ -396,6 +403,7 @@ function orderCard(doc,adminMode){
     d.price&&`<span class="chip">💴 ${esc(d.price)}</span>`,
     d.dueDate&&`<span class="chip">📅 希望：${esc(d.dueDate)}</span>`,
     d.supplier&&`<span class="chip">🛒 ${esc(d.supplier)}</span>`,
+    d.productUrl&&isSafeUrl(d.productUrl)&&`<span class="chip">🔗 <a href="${esc(d.productUrl)}" target="_blank" rel="noopener noreferrer" style="color:#5bbfff;text-decoration:none">商品リンクを開く</a></span>`,
   ].filter(Boolean).join('');
   const adminActionsHtml=adminMode?`
     <div class="admin-actions">
@@ -473,6 +481,7 @@ async function submitOrder(){
       price:document.getElementById('f-price').value.trim(),
       dueDate:document.getElementById('f-due').value,
       supplier:document.getElementById('f-supplier').value.trim(),
+      productUrl:document.getElementById('f-url').value.trim(),
       reason,urgency,status:'pending',adminNote:'',
       createdAt:firebase.firestore.FieldValue.serverTimestamp(),
       updatedAt:firebase.firestore.FieldValue.serverTimestamp()
@@ -485,7 +494,7 @@ async function submitOrder(){
 }
 
 function clearForm(){
-  ['f-name','f-item','f-qty','f-price','f-due','f-supplier','f-reason'].forEach(id=>document.getElementById(id).value='');
+  ['f-name','f-item','f-qty','f-price','f-due','f-supplier','f-url','f-reason'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('f-dept').value='';
   document.getElementById('f-cat').value='';
   document.getElementById('f-unit').value='個';
