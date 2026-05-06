@@ -179,6 +179,8 @@ body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100v
 .lt-doc{background:rgba(91,191,255,.2);color:#5bbfff}
 .lt-folder{background:rgba(255,200,80,.2);color:#ffd966}
 .lt-other{background:rgba(200,200,200,.15);color:rgba(255,255,255,.6)}
+.link-icon-form{background:rgba(180,120,255,.15)}
+.lt-form{background:rgba(180,120,255,.2);color:#c084fc}
 .links-updated{font-size:11px;color:rgba(255,255,255,.3);text-align:right;margin-bottom:16px}
 .back-btn{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.6);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:16px;background:none;border:none}
 .back-btn:hover{color:#fff}
@@ -540,10 +542,32 @@ const LINKS_DATA=[
     ]
   },
   {
+    category:'規定・通達',icon:'📜',
+    items:[
+      {title:'内部規程文書',url:'https://docs.google.com/document/d/14zO-WDteYKhaCX8pt6G_psV9OgtIZ-qMBFdAuCAgtyE/edit',type:'doc',desc:'法人内の各種規程・就業規則等'},
+      {title:'内部通報制度 掲示',url:'https://drive.google.com/file/d/1MD9hr4J2sVhGs52iADHInfkffyAfipbN/view',type:'pdf',desc:'内部通報制度の概要・対象・手続きの掲示資料'},
+      {title:'あなたの声を届ける窓口（内部通報フォーム）',url:'https://docs.google.com/forms/d/16TXJOuQDQpDrfe4FcFvPBrKP33MzK844tf_mEtTNFZE/viewform',type:'form',desc:'内部通報・相談の受付フォーム'},
+    ]
+  },
+  {
+    category:'報告フォーム',icon:'📋',
+    items:[
+      {title:'問題行動報告フォーム（管理者向け）',url:'https://docs.google.com/forms/d/1ChTLZZnrZjjBpucQ2WmTg-atC-0sgSyBzh2lu3A2_Xk/viewform',type:'form',desc:'職員の問題行動発生時・管理者が記録・報告するフォーム'},
+      {title:'災害発生時報告書フォーム',url:'https://docs.google.com/forms/d/1-3sx3Wh8DmZ2NNrDl8Z23TvQQo7VeDcwnCpR2pq4Qnw/viewform',type:'form',desc:'災害・緊急事態発生時の状況報告フォーム'},
+    ]
+  },
+  {
+    category:'勤怠・給与システム',icon:'💼',
+    items:[
+      {title:'マネーフォワードクラウド メールアドレス収集のお願い',url:'https://docs.google.com/document/d/1C7NTDPPpHBRaRGYsDAxnRrb-BVQCKM9qLB7gBNRmcRo/edit',type:'doc',desc:'勤怠・給与管理アプリ導入に伴うご案内'},
+      {title:'メールアドレス提出フォーム',url:'https://docs.google.com/forms/d/1k63nbmP9TGUKyZnuNDFoncfbuibnetnN34Vey-gwVJI/viewform',type:'form',desc:'マネーフォワードクラウド登録用メールアドレスの提出'},
+    ]
+  },
+  {
     category:'人事・採用制度',icon:'👥',
     items:[
       {title:'職員紹介制度 要項',url:'https://docs.google.com/document/d/1qAi7HV26ciI9qk8Xe5AlJvY0175z0YTNp6AINE0TesY/edit',type:'doc',desc:'職員紹介制度の概要・対象・報奨金の条件'},
-      {title:'職員紹介制度 申請書',url:'https://docs.google.com/document/d/13HyVmrcR9YIRUAO5_k_cv6mVy2wu4uS8A5hVzYivggs/edit',type:'doc',desc:'職員紹介時の申請フォーム（記入・提出用）'},
+      {title:'職員紹介制度 申請書',url:'https://docs.google.com/document/d/13HyVmrcR9YIRUAO5_k_cv6mVy2wu4uS8A5hVzYivggs/edit',type:'doc',desc:'職員紹介時の申請書（記入・提出用）'},
     ]
   },
 ];
@@ -562,6 +586,7 @@ function renderLinks(){
         sheet:{icon:'📊',cls:'link-icon-sheet',badge:'スプレッドシート',badgeCls:'lt-sheet'},
         doc:{icon:'📝',cls:'link-icon-doc',badge:'ドキュメント',badgeCls:'lt-doc'},
         folder:{icon:'📁',cls:'link-icon-folder',badge:'フォルダ',badgeCls:'lt-folder'},
+        form:{icon:'📋',cls:'link-icon-form',badge:'フォーム',badgeCls:'lt-form'},
         other:{icon:'📎',cls:'link-icon-other',badge:'ファイル',badgeCls:'lt-other'}
       }[item.type]||{icon:'📎',cls:'link-icon-other',badge:'ファイル',badgeCls:'lt-other'};
       return `<a class="link-item" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">
