@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>備品・物品発注 | 医療法人いなだ医院</title>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100vh;background:linear-gradient(145deg,#5bbfff 0%,#1a72c8 35%,#0d3a7a 65%,#061428 100%);color:#1a202c}
+#loading{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;background:linear-gradient(145deg,#5bbfff 0%,#1a72c8 35%,#0d3a7a 65%,#061428 100%)}
+.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.2);border-top:3px solid #fff;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#login{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:20px}
+.login-card{background:rgba(255,255,255,.13);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.22);border-radius:24px;padding:40px;width:100%;max-width:380px;box-shadow:0 8px 40px rgba(0,0,0,.25)}
+.login-card h1{color:#fff;font-size:18px;font-weight:800;text-align:center;margin-bottom:6px}
+.login-card .sub{color:rgba(255,255,255,.55);font-size:12px;text-align:center;margin-bottom:28px}
+.login-card label{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.7);margin-bottom:8px;letter-spacing:.08em;text-transform:uppercase}
+.login-card input{width:100%;padding:12px 16px;background:rgba(255,255,255,.95);border:1px solid rgba(255,255,255,.6);border-radius:10px;font-size:15px;color:#1a202c;outline:none;margin-bottom:16px;transition:border .2s,box-shadow .2s}
+.login-card input:focus{border-color:#5bbfff;box-shadow:0 0 0 3px rgba(91,191,255,.25)}
+.login-card input::placeholder{color:#a0aec0}
+.btn-login{width:100%;padding:13px;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(220,240,255,.95));color:#0d3a7a;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;transition:opacity .2s}
+.btn-login:hover{opacity:.9}
+#login-err{display:none;background:rgba(255,100,100,.18);border:1px solid rgba(255,150,150,.4);color:#ffe0e0;border-radius:8px;padding:10px 14px;font-size:13px;margin-top:12px;text-align:center}
+#app{display:none;min-height:100vh}
+.hd{background:rgba(6,20,40,.65);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.1);color:#fff;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.hd-left{display:flex;align-items:center;gap:12px}
+.hd-title{font-size:15px;font-weight:800;color:#fff}
+.hd-sub{font-size:10px;color:rgba(255,255,255,.5);margin-top:1px}
+.hd-right{display:flex;align-items:center;gap:8px}
+.badge-admin{background:rgba(255,200,80,.2);border:1px solid rgba(255,200,80,.4);color:#ffd966;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700}
+.btn-back{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:7px;padding:5px 12px;font-size:12px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.tabs{background:rgba(6,20,40,.4);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08);display:flex;padding:0 16px;gap:4px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{padding:14px 18px;font-size:13px;font-weight:700;color:rgba(255,255,255,.5);background:none;border:none;cursor:pointer;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;letter-spacing:.03em;white-space:nowrap}
+.tab-btn.active{color:#5bbfff;border-bottom-color:#5bbfff}
+.tab-btn:hover{color:rgba(255,255,255,.8)}
+.content{max-width:800px;margin:0 auto;padding:24px 16px}
+.form-card{background:rgba(255,255,255,.1);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:28px}
+.form-card h2{color:#fff;font-size:16px;font-weight:800;margin-bottom:24px}
+.form-row{margin-bottom:18px}
+.form-row label{display:block;font-size:12px;font-weight:700;color:rgba(255,255,255,.75);margin-bottom:8px;letter-spacing:.05em}
+.req{color:#ff8888;margin-left:2px}
+.form-input,.form-select,.form-textarea{width:100%;padding:10px 12px;background:rgba(255,255,255,.95);border:1px solid rgba(200,220,255,.8);border-radius:8px;color:#1a202c;font-size:14px;outline:none;transition:border .2s,box-shadow .2s}
+.form-input::placeholder,.form-textarea::placeholder{color:#a0aec0}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:#5bbfff;box-shadow:0 0 0 3px rgba(91,191,255,.2)}
+.form-textarea{resize:vertical;min-height:90px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row2 .form-row{margin-bottom:0}
+.urgency-group{display:flex;gap:10px;flex-wrap:wrap}
+.urg-opt{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:1.5px solid rgba(255,255,255,.2);cursor:pointer;transition:all .2s}
+.urg-opt:has(input:checked){border-color:#5bbfff;background:rgba(91,191,255,.15)}
+.urg-opt input{display:none}
+.urg-opt span{font-size:13px;color:rgba(255,255,255,.85);font-weight:600}
+.urg-small{font-size:11px;color:rgba(255,255,255,.5);margin-left:2px}
+.btn-submit{width:100%;padding:14px;background:linear-gradient(135deg,#5bbfff,#1a72c8);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;margin-top:8px;transition:opacity .2s}
+.btn-submit:hover{opacity:.9}
+.btn-submit:disabled{opacity:.5;cursor:not-allowed}
+.filter-bar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:20px;color:rgba(255,255,255,.65);font-size:12px;cursor:pointer;transition:all .2s}
+.filter-btn.on{background:rgba(91,191,255,.2);border-color:rgba(91,191,255,.5);color:#5bbfff;font-weight:700}
+.order-card{background:rgba(255,255,255,.1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:20px;margin-bottom:14px}
+.order-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.order-name{font-size:16px;font-weight:800;color:#fff}
+.order-meta{font-size:12px;color:rgba(255,255,255,.5);margin-top:3px}
+.badges{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.st-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.st-pending{background:rgba(255,200,50,.15);border:1px solid rgba(255,200,50,.4);color:#ffd966}
+.st-approved{background:rgba(80,220,100,.15);border:1px solid rgba(80,220,100,.4);color:#68d391}
+.st-ordered{background:rgba(91,191,255,.15);border:1px solid rgba(91,191,255,.4);color:#5bbfff}
+.st-delivered{background:rgba(200,200,200,.12);border:1px solid rgba(200,200,200,.3);color:rgba(255,255,255,.6)}
+.st-rejected{background:rgba(255,100,100,.15);border:1px solid rgba(255,100,100,.4);color:#fc8181}
+.urg-badge{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+.urg-normal{background:rgba(100,200,100,.12);color:#68d391}
+.urg-urgent{background:rgba(255,180,50,.15);color:#fbd38d}
+.urg-emergency{background:rgba(255,80,80,.15);color:#fc8181}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.chip{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:4px 10px;font-size:12px;color:rgba(255,255,255,.75)}
+.order-reason{font-size:13px;color:rgba(255,255,255,.7);line-height:1.6;margin-bottom:12px}
+.admin-note-box{background:rgba(255,100,100,.1);border:1px solid rgba(255,100,100,.2);border-radius:8px;padding:10px;font-size:12px;color:#fc8181;margin-top:8px}
+.admin-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center}
+.btn-approve{padding:7px 16px;background:rgba(80,220,100,.2);border:1px solid rgba(80,220,100,.4);color:#68d391;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:background .2s}
+.btn-approve:hover{background:rgba(80,220,100,.35)}
+.btn-reject{padding:7px 16px;background:rgba(255,100,100,.15);border:1px solid rgba(255,100,100,.3);color:#fc8181;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:background .2s}
+.btn-reject:hover{background:rgba(255,100,100,.3)}
+.st-select{padding:6px 10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#fff;font-size:12px;cursor:pointer}
+.st-select option{background:#1a202c;color:#fff}
+.empty{text-align:center;padding:60px 20px;color:rgba(255,255,255,.4)}
+.empty-icon{font-size:48px;margin-bottom:12px}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(30,60,100,.95);backdrop-filter:blur(12px);border:1px solid rgba(91,191,255,.3);color:#fff;padding:12px 24px;border-radius:30px;font-size:14px;z-index:999;pointer-events:none;opacity:0;transition:opacity .3s;white-space:nowrap}
+#toast.show{opacity:1}
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-ov.open{display:flex}
+.modal{background:rgba(15,30,60,.95);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:28px;width:100%;max-width:400px}
+.modal h3{color:#fff;font-size:16px;font-weight:800;margin-bottom:16px}
+.modal label{display:block;font-size:12px;color:rgba(255,255,255,.6);margin-bottom:8px}
+.modal textarea{width:100%;padding:10px;background:rgba(255,255,255,.95);border:1px solid rgba(200,220,255,.8);border-radius:8px;color:#1a202c;font-size:13px;min-height:80px;resize:none;outline:none;margin-bottom:16px}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end}
+.btn-modal-ok{padding:8px 20px;background:rgba(220,50,50,.8);border:none;color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer}
+.btn-modal-cancel{padding:8px 20px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:8px;font-size:13px;cursor:pointer}
+@media(max-width:600px){.row2{grid-template-columns:1fr}.hd-sub{display:none}}
+</style>
+</head>
+<body>
+
+<div id="loading"><div class="spinner"></div></div>
+
+<div id="login" style="display:none">
+  <div class="login-card">
+    <h1>📦 備品・物品発注</h1>
+    <p class="sub">医療法人いなだ医院</p>
+    <label>アクセスコード</label>
+    <input type="password" id="login-pw" placeholder="アクセスコードを入力">
+    <button class="btn-login" onclick="doLogin()">ログイン</button>
+    <div id="login-err">アクセスコードが正しくありません</div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
+  <div class="hd">
+    <div class="hd-left">
+      <div>
+        <div class="hd-title">📦 備品・物品発注</div>
+        <div class="hd-sub">医療法人いなだ医院</div>
+      </div>
+    </div>
+    <div class="hd-right">
+      <span id="admin-badge" class="badge-admin" style="display:none">管理者</span>
+      <a href="https://aura-net-system.github.io/" class="btn-back">← ポータル</a>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('apply')" id="t-apply">発注申請</button>
+    <button class="tab-btn" onclick="switchTab('list')" id="t-list">申請一覧</button>
+    <button class="tab-btn" onclick="switchTab('admin')" id="t-admin" style="display:none">承認管理</button>
+  </div>
+
+  <!-- 申請フォーム -->
+  <div id="tab-apply" class="content">
+    <div class="form-card">
+      <h2>📋 発注申請フォーム</h2>
+      <div class="form-row">
+        <label>申請者名<span class="req">*</span></label>
+        <input class="form-input" id="f-name" placeholder="例：田中 花子">
+      </div>
+      <div class="row2">
+        <div class="form-row">
+          <label>所属部門<span class="req">*</span></label>
+          <select class="form-select" id="f-dept">
+            <option value="">選択してください</option>
+            <option>医院</option>
+            <option>居宅</option>
+            <option>小多機</option>
+            <option>サ高住</option>
+            <option>デイサービス</option>
+            <option>訪問介護</option>
+            <option>厨房</option>
+            <option>その他</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>カテゴリ<span class="req">*</span></label>
+          <select class="form-select" id="f-cat">
+            <option value="">選択してください</option>
+            <option>医療・衛生用品</option>
+            <option>事務用品</option>
+            <option>清掃・消耗品</option>
+            <option>食品・飲料</option>
+            <option>設備・備品</option>
+            <option>その他</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:18px">
+        <label>品名<span class="req">*</span></label>
+        <input class="form-input" id="f-item" placeholder="例：使い捨て手袋（Mサイズ）">
+      </div>
+      <div class="row2">
+        <div class="form-row">
+          <label>数量<span class="req">*</span></label>
+          <input class="form-input" id="f-qty" type="number" min="1" placeholder="1">
+        </div>
+        <div class="form-row">
+          <label>単位<span class="req">*</span></label>
+          <select class="form-select" id="f-unit">
+            <option>個</option>
+            <option>箱</option>
+            <option>袋</option>
+            <option>本</option>
+            <option>枚</option>
+            <option>セット</option>
+            <option>ケース</option>
+            <option>その他</option>
+          </select>
+        </div>
+      </div>
+      <div class="row2" style="margin-top:18px">
+        <div class="form-row">
+          <label>参考価格（任意）</label>
+          <input class="form-input" id="f-price" placeholder="例：1,200円/箱">
+        </div>
+        <div class="form-row">
+          <label>希望納期（任意）</label>
+          <input class="form-input" id="f-due" type="date">
+        </div>
+      </div>
+      <div class="form-row" style="margin-top:18px">
+        <label>購入先候補（任意）</label>
+        <input class="form-input" id="f-supplier" placeholder="例：アスクル、Amazon、近隣薬局">
+      </div>
+      <div class="form-row">
+        <label>理由・用途<span class="req">*</span></label>
+        <textarea class="form-textarea" id="f-reason" placeholder="なぜ必要か、どのような用途かを記入してください"></textarea>
+      </div>
+      <div class="form-row">
+        <label>緊急度<span class="req">*</span></label>
+        <div class="urgency-group">
+          <label class="urg-opt">
+            <input type="radio" name="urgency" value="normal" checked>
+            <span>通常 <span class="urg-small">1週間程度</span></span>
+          </label>
+          <label class="urg-opt">
+            <input type="radio" name="urgency" value="urgent">
+            <span>急ぎ <span class="urg-small">3日以内</span></span>
+          </label>
+          <label class="urg-opt">
+            <input type="radio" name="urgency" value="emergency">
+            <span>緊急 <span class="urg-small">当日・翌日</span></span>
+          </label>
+        </div>
+      </div>
+      <button class="btn-submit" id="btn-apply" onclick="submitOrder()">申請する</button>
+    </div>
+  </div>
+
+  <!-- 申請一覧 -->
+  <div id="tab-list" class="content" style="display:none">
+    <div class="filter-bar" id="list-filters">
+      <button class="filter-btn on" onclick="setFilter('list','all',this)">すべて</button>
+      <button class="filter-btn" onclick="setFilter('list','pending',this)">申請中</button>
+      <button class="filter-btn" onclick="setFilter('list','approved',this)">承認済</button>
+      <button class="filter-btn" onclick="setFilter('list','ordered',this)">発注済</button>
+      <button class="filter-btn" onclick="setFilter('list','delivered',this)">納品済</button>
+      <button class="filter-btn" onclick="setFilter('list','rejected',this)">却下</button>
+    </div>
+    <div id="list-orders"></div>
+  </div>
+
+  <!-- 承認管理（管理者のみ） -->
+  <div id="tab-admin" class="content" style="display:none">
+    <div class="filter-bar" id="admin-filters">
+      <button class="filter-btn on" onclick="setFilter('admin','all',this)">すべて</button>
+      <button class="filter-btn" onclick="setFilter('admin','pending',this)">要対応</button>
+      <button class="filter-btn" onclick="setFilter('admin','approved',this)">承認済</button>
+      <button class="filter-btn" onclick="setFilter('admin','ordered',this)">発注済</button>
+      <button class="filter-btn" onclick="setFilter('admin','delivered',this)">納品済</button>
+      <button class="filter-btn" onclick="setFilter('admin','rejected',this)">却下</button>
+    </div>
+    <div id="admin-orders"></div>
+  </div>
+</div>
+
+<!-- 却下モーダル -->
+<div class="modal-ov" id="reject-modal">
+  <div class="modal">
+    <h3>申請を却下する</h3>
+    <label>却下理由（任意）</label>
+    <textarea id="reject-note" placeholder="理由を入力してください"></textarea>
+    <div class="modal-btns">
+      <button class="btn-modal-cancel" onclick="closeModal()">キャンセル</button>
+      <button class="btn-modal-ok" id="reject-confirm">却下する</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const FB_CONFIG={apiKey:'AIzaSyBxXY1aji7J9H0qwrV76VgPxaHJ4wU9E-I',authDomain:'aura-net-portal.firebaseapp.com',projectId:'aura-net-portal',storageBucket:'aura-net-portal.firebasestorage.app',appId:'1:893378399815:web:eff366abc877fc8206ab62'};
+const FB_AUTH_PASS='Ap3#Rz7-Mn4Kw';
+const FB_SYS_PASS='06419008';
+const ADMIN_PASS='22582405';
+const FB_SYS_EMAIL='portal@aura-net.local';
+
+firebase.initializeApp(FB_CONFIG);
+const auth=firebase.auth();
+const db=firebase.firestore();
+
+let isAdmin=false;
+let listFilter='all';
+let adminFilter='all';
+let allOrders=[];
+let adminOrders=[];
+let rejectTargetId=null;
+
+auth.onAuthStateChanged(user=>{
+  if(user){
+    const role=sessionStorage.getItem('aura_role');
+    isAdmin=(role==='admin');
+    initApp();
+  } else {
+    const role=sessionStorage.getItem('aura_role');
+    if(role){
+      auth.signInWithEmailAndPassword(FB_SYS_EMAIL,FB_AUTH_PASS)
+        .then(()=>{isAdmin=(role==='admin');initApp();})
+        .catch(()=>showLogin());
+    } else {
+      showLogin();
+    }
+  }
+});
+
+function showLogin(){
+  document.getElementById('loading').style.display='none';
+  document.getElementById('login').style.display='flex';
+}
+
+function initApp(){
+  document.getElementById('loading').style.display='none';
+  document.getElementById('app').style.display='block';
+  if(isAdmin){
+    document.getElementById('admin-badge').style.display='';
+    document.getElementById('t-admin').style.display='';
+  }
+  loadOrders();
+  if(isAdmin) loadAdminOrders();
+}
+
+async function doLogin(){
+  const pw=document.getElementById('login-pw').value.trim();
+  const err=document.getElementById('login-err');
+  err.style.display='none';
+  if(pw!==FB_SYS_PASS&&pw!==ADMIN_PASS){err.style.display='block';return;}
+  isAdmin=(pw===ADMIN_PASS);
+  try{
+    await auth.signInWithEmailAndPassword(FB_SYS_EMAIL,FB_AUTH_PASS);
+    sessionStorage.setItem('aura_role',isAdmin?'admin':'staff');
+    document.getElementById('login').style.display='none';
+    initApp();
+  }catch(e){err.style.display='block';}
+}
+
+document.getElementById('login-pw').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.isComposing) doLogin();
+});
+
+function switchTab(tab){
+  ['apply','list','admin'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=(t===tab)?'':'none';
+    const btn=document.getElementById('t-'+t);
+    if(btn) btn.classList.toggle('active',t===tab);
+  });
+}
+
+function setFilter(type,status,btn){
+  if(type==='list'){
+    listFilter=status;
+    document.querySelectorAll('#list-filters .filter-btn').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    renderOrders();
+  } else {
+    adminFilter=status;
+    document.querySelectorAll('#admin-filters .filter-btn').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    renderAdminOrders();
+  }
+}
+
+const ST={
+  pending:{label:'申請中',cls:'st-pending'},
+  approved:{label:'承認済',cls:'st-approved'},
+  ordered:{label:'発注済',cls:'st-ordered'},
+  delivered:{label:'納品済',cls:'st-delivered'},
+  rejected:{label:'却下',cls:'st-rejected'}
+};
+const URG={
+  normal:{label:'通常',cls:'urg-normal'},
+  urgent:{label:'急ぎ',cls:'urg-urgent'},
+  emergency:{label:'緊急',cls:'urg-emergency'}
+};
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function orderCard(doc,adminMode){
+  const d=doc.data();
+  const st=ST[d.status]||ST.pending;
+  const urg=URG[d.urgency]||URG.normal;
+  const date=d.createdAt?.toDate().toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})||'';
+  const chips=[
+    d.dept&&`<span class="chip">🏥 ${esc(d.dept)}</span>`,
+    d.category&&`<span class="chip">🏷️ ${esc(d.category)}</span>`,
+    `<span class="chip">📦 ${esc(String(d.qty))}${esc(d.unit)}</span>`,
+    d.price&&`<span class="chip">💴 ${esc(d.price)}</span>`,
+    d.dueDate&&`<span class="chip">📅 希望：${esc(d.dueDate)}</span>`,
+    d.supplier&&`<span class="chip">🛒 ${esc(d.supplier)}</span>`,
+  ].filter(Boolean).join('');
+  const adminActionsHtml=adminMode?`
+    <div class="admin-actions">
+      ${d.status==='pending'?`<button class="btn-approve" onclick="approveOrder('${doc.id}')">✓ 承認</button><button class="btn-reject" onclick="openReject('${doc.id}')">✕ 却下</button>`:''}
+      <select class="st-select" onchange="updateStatus('${doc.id}',this.value)">
+        <option value="">ステータス変更...</option>
+        <option value="approved">承認済</option>
+        <option value="ordered">発注済</option>
+        <option value="delivered">納品済</option>
+        <option value="rejected">却下</option>
+      </select>
+    </div>`:'';
+  const noteHtml=d.adminNote?`<div class="admin-note-box">📝 ${esc(d.adminNote)}</div>`:'';
+  return `<div class="order-card">
+    <div class="order-top">
+      <div>
+        <div class="order-name">${esc(d.itemName)}</div>
+        <div class="order-meta">${esc(d.applicantName)} · ${esc(d.dept||'')} · ${date}</div>
+      </div>
+      <div class="badges">
+        <span class="urg-badge ${urg.cls}">${urg.label}</span>
+        <span class="st-badge ${st.cls}">${st.label}</span>
+      </div>
+    </div>
+    <div class="chips">${chips}</div>
+    ${d.reason?`<div class="order-reason">${esc(d.reason)}</div>`:''}
+    ${noteHtml}${adminActionsHtml}
+  </div>`;
+}
+
+function loadOrders(){
+  db.collection('orders').orderBy('createdAt','desc').onSnapshot(snap=>{
+    allOrders=snap.docs;
+    renderOrders();
+  });
+}
+
+function renderOrders(){
+  const el=document.getElementById('list-orders');
+  let docs=allOrders;
+  if(listFilter!=='all') docs=docs.filter(d=>d.data().status===listFilter);
+  el.innerHTML=docs.length?docs.map(d=>orderCard(d,false)).join(''):'<div class="empty"><div class="empty-icon">📭</div><div>申請はありません</div></div>';
+}
+
+function loadAdminOrders(){
+  db.collection('orders').orderBy('createdAt','desc').onSnapshot(snap=>{
+    adminOrders=snap.docs;
+    renderAdminOrders();
+  });
+}
+
+function renderAdminOrders(){
+  const el=document.getElementById('admin-orders');
+  let docs=adminOrders;
+  if(adminFilter==='pending') docs=docs.filter(d=>d.data().status==='pending');
+  else if(adminFilter!=='all') docs=docs.filter(d=>d.data().status===adminFilter);
+  el.innerHTML=docs.length?docs.map(d=>orderCard(d,true)).join(''):'<div class="empty"><div class="empty-icon">✅</div><div>該当する申請はありません</div></div>';
+}
+
+async function submitOrder(){
+  const btn=document.getElementById('btn-apply');
+  const name=document.getElementById('f-name').value.trim();
+  const dept=document.getElementById('f-dept').value;
+  const cat=document.getElementById('f-cat').value;
+  const item=document.getElementById('f-item').value.trim();
+  const qty=parseInt(document.getElementById('f-qty').value)||0;
+  const unit=document.getElementById('f-unit').value;
+  const reason=document.getElementById('f-reason').value.trim();
+  const urgency=document.querySelector('input[name="urgency"]:checked')?.value||'normal';
+  if(!name||!dept||!cat||!item||!qty||!reason){toast('＊ 必須項目を入力してください');return;}
+  btn.disabled=true;btn.textContent='送信中...';
+  try{
+    await db.collection('orders').add({
+      applicantName:name,dept,category:cat,itemName:item,qty,unit,
+      price:document.getElementById('f-price').value.trim(),
+      dueDate:document.getElementById('f-due').value,
+      supplier:document.getElementById('f-supplier').value.trim(),
+      reason,urgency,status:'pending',adminNote:'',
+      createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    toast('申請を送信しました');
+    clearForm();
+    switchTab('list');
+  }catch(e){toast('送信に失敗しました');}
+  btn.disabled=false;btn.textContent='申請する';
+}
+
+function clearForm(){
+  ['f-name','f-item','f-qty','f-price','f-due','f-supplier','f-reason'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-dept').value='';
+  document.getElementById('f-cat').value='';
+  document.getElementById('f-unit').value='個';
+  document.querySelector('input[name="urgency"][value="normal"]').checked=true;
+}
+
+async function approveOrder(id){
+  await db.collection('orders').doc(id).update({status:'approved',updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  toast('承認しました');
+}
+
+function openReject(id){
+  rejectTargetId=id;
+  document.getElementById('reject-note').value='';
+  document.getElementById('reject-modal').classList.add('open');
+  document.getElementById('reject-confirm').onclick=async()=>{
+    const note=document.getElementById('reject-note').value.trim();
+    await db.collection('orders').doc(rejectTargetId).update({
+      status:'rejected',adminNote:note,updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeModal();
+    toast('却下しました');
+  };
+}
+
+function closeModal(){document.getElementById('reject-modal').classList.remove('open');}
+
+async function updateStatus(id,status){
+  if(!status) return;
+  await db.collection('orders').doc(id).update({status,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  toast('ステータスを更新しました');
+}
+
+let toastTimer;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
+}
+</script>
+</body>
+</html>
