@@ -249,12 +249,12 @@ body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100v
         <div class="card-desc">日頃の感謝をみんなで共有する</div>
         <span class="card-badge badge-active">稼働中</span>
       </div>
-      <div class="app-card disabled">
+      <a class="app-card active-card" href="https://aura-net-system.github.io/order/" target="_blank">
         <div class="card-icon">📦</div>
         <div class="card-title">備品・物品発注</div>
-        <div class="card-desc">消耗品の在庫申請・発注履歴</div>
-        <span class="card-badge badge-soon">準備中</span>
-      </div>
+        <div class="card-desc">消耗品の発注申請・承認・ステータス管理</div>
+        <span class="card-badge badge-active">稼働中</span>
+      </a>
       <div class="app-card disabled">
         <div class="card-icon">📚</div>
         <div class="card-title">業務マニュアル</div>
@@ -518,6 +518,7 @@ async function doLogin(){
   btn.disabled=true;btn.textContent='ログイン中...';
   try{
     await auth.signInWithEmailAndPassword(FB_SYS_EMAIL,FB_AUTH_PASS);
+    sessionStorage.setItem('aura_role',isAdmin?'admin':'staff');
   }catch(e){
     showErr(e.code==='auth/too-many-requests'?'試行回数が多すぎます':'ログインに失敗しました（'+e.code+'）');
     btn.disabled=false;btn.textContent='ログイン';isAdmin=false;
@@ -526,7 +527,7 @@ async function doLogin(){
 }
 document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing)doLogin();});
 
-function doLogout(){if(!confirm('ログアウトしますか？'))return;auth.signOut();document.getElementById('password').value='';isAdmin=false;}
+function doLogout(){if(!confirm('ログアウトしますか？'))return;auth.signOut();sessionStorage.removeItem('aura_role');document.getElementById('password').value='';isAdmin=false;}
 
 // ── タブ切替 ──
 function switchTab(tab){
