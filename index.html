@@ -202,6 +202,9 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
 .links-toc-label{font-size:10px;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:.1em;text-transform:uppercase;flex-basis:100%;margin-bottom:4px}
 .toc-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;font-size:12px;font-weight:700;color:rgba(255,255,255,.8);cursor:pointer;transition:all .15s;text-decoration:none;white-space:nowrap}
 .toc-pill:hover{background:rgba(91,191,255,.22);border-color:rgba(91,191,255,.4);color:#fff}
+/* 管理者セクション区切り */
+.links-section-divider{display:flex;align-items:center;gap:12px;margin:30px 0 16px;font-size:11px;font-weight:800;color:rgba(255,200,80,.9);letter-spacing:.08em}
+.links-section-divider::before,.links-section-divider::after{content:'';flex:1;border-top:1px solid rgba(255,200,80,.2)}
 .back-btn{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.6);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:16px;background:none;border:none}
 .back-btn:hover{color:#fff}
 
@@ -314,18 +317,6 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
         <div class="card-title">書類・リンク集</div>
         <div class="card-desc">マニュアル・様式・通知などの書類一覧</div>
         <span class="card-badge badge-active">稼働中</span>
-      </div>
-      <div class="app-card disabled">
-        <div class="card-icon">📅</div>
-        <div class="card-title">休暇申請</div>
-        <div class="card-desc">有給・各種休暇の申請・承認</div>
-        <span class="card-badge badge-soon">準備中</span>
-      </div>
-      <div class="app-card disabled">
-        <div class="card-icon">💊</div>
-        <div class="card-title">加算算定チェッカー</div>
-        <div class="card-desc">2026診療報酬改訂対応</div>
-        <span class="card-badge badge-dev">企画中</span>
       </div>
     </div>
     <div style="height:40px"></div>
@@ -638,6 +629,9 @@ function renderLinks(){
     form:{icon:'📋',cls:'link-icon-form',badge:'フォーム',badgeCls:'lt-form'},
     other:{icon:'📎',cls:'link-icon-other',badge:'ファイル',badgeCls:'lt-other'}
   };
+  function filterItems(items){
+    return (items||[]).filter(it=>isAdmin||it.audience!=='admin');
+  }
   function renderItem(item){
     const t=TYPE_MAP[item.type]||TYPE_MAP.other;
     return `<a class="link-item" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">
@@ -653,28 +647,55 @@ function renderLinks(){
   function renderGrid(items){
     return `<div class="links-grid">${items.map(renderItem).join('')}</div>`;
   }
-  // TOC
-  const tocPills=LINKS_DATA.map((cat,i)=>
-    `<a class="toc-pill" href="#lcat-${i}" onclick="event.preventDefault();var el=document.getElementById('lcat-${i}');if(el){el.open=true;setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'start'});},50);}">${esc(cat.icon)} ${esc(cat.category)}</a>`
-  ).join('');
-  const tocHtml=`<div class="links-toc"><span class="links-toc-label">▼ カテゴリ一覧</span>${tocPills}</div>`;
-
-  const html=LINKS_DATA.map((cat,i)=>{
+  function renderCat(cat,id){
+    const directItems=filterItems(cat.items||[]);
     let body='';
-    if(cat.items&&cat.items.length) body+=renderGrid(cat.items);
+    if(directItems.length) body+=renderGrid(directItems);
     if(cat.sub&&cat.sub.length){
-      body+=cat.sub.map(s=>`
-        <details class="links-subcategory" open>
+      body+=cat.sub.map(s=>{
+        const subItems=filterItems(s.items||[]);
+        if(!subItems.length) return '';
+        return `<details class="links-subcategory" open>
           <summary class="links-subcat-title">${esc(s.icon||'')} ${esc(s.category)}</summary>
-          <div class="links-subgrid">${renderGrid(s.items)}</div>
-        </details>`).join('');
+          <div class="links-subgrid">${renderGrid(subItems)}</div>
+        </details>`;
+      }).filter(Boolean).join('');
     }
-    return `<details class="links-category" id="lcat-${i}" open>
+    if(!body) return '';
+    return `<details class="links-category" id="${id}" open>
       <summary class="links-cat-title">${esc(cat.icon)} ${esc(cat.category)}</summary>
       <div class="links-body">${body}</div>
     </details>`;
-  }).join('');
-  el.innerHTML=updatedHtml+tocHtml+html;
+  }
+
+  // 従業員向け（全員）セクション
+  const empCats=LINKS_DATA.filter(c=>c.audience!=='admin');
+  const empTocPills=empCats.map((cat,i)=>
+    `<a class="toc-pill" href="#lcat-${i}" onclick="event.preventDefault();var el=document.getElementById('lcat-${i}');if(el){el.open=true;setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'start'});},50);}">${esc(cat.icon)} ${esc(cat.category)}</a>`
+  ).join('');
+  const tocHtml=`<div class="links-toc"><span class="links-toc-label">▼ カテゴリ一覧</span>${empTocPills}</div>`;
+  const empHtml=empCats.map((cat,i)=>renderCat(cat,'lcat-'+i)).filter(Boolean).join('');
+
+  // 管理者向けセクション
+  let adminHtml='';
+  if(isAdmin){
+    const adminCats=LINKS_DATA.filter(c=>c.audience==='admin');
+    const adminContent=adminCats.map((cat,i)=>renderCat(cat,'acat-'+i)).filter(Boolean).join('');
+    // audience:'admin' な個別アイテムを抽出（カテゴリが全員向けの中にあるもの）
+    const adminItems=[];
+    LINKS_DATA.filter(c=>c.audience!=='admin').forEach(c=>{
+      (c.items||[]).filter(it=>it.audience==='admin').forEach(it=>adminItems.push(it));
+      (c.sub||[]).forEach(s=>(s.items||[]).filter(it=>it.audience==='admin').forEach(it=>adminItems.push(it)));
+    });
+    const adminItemsHtml=adminItems.length?`<details class="links-category" id="acat-items" open>
+      <summary class="links-cat-title">📌 管理者限定コンテンツ</summary>
+      <div class="links-body">${renderGrid(adminItems)}</div>
+    </details>`:'';
+    const combined=adminItemsHtml+adminContent;
+    if(combined) adminHtml=`<div class="links-section-divider"><span>🔐 管理者向け資料</span></div>${combined}`;
+  }
+
+  el.innerHTML=updatedHtml+tocHtml+empHtml+adminHtml;
 }
 let noticeFiles=[];
 
