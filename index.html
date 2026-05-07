@@ -159,9 +159,19 @@ body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100v
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(10,30,60,.92);border:1px solid rgba(91,191,255,.3);color:#fff;padding:10px 22px;border-radius:10px;font-size:13px;font-weight:700;z-index:999;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
 .empty-msg{text-align:center;color:rgba(255,255,255,.4);font-size:14px;padding:40px 20px}
-.links-category{margin-bottom:24px}
-.links-cat-title{font-size:13px;font-weight:800;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.links-category{margin-bottom:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:14px;overflow:hidden}
+.links-cat-title{font-size:13px;font-weight:800;color:rgba(255,255,255,.85);letter-spacing:.05em;padding:14px 16px;display:flex;align-items:center;gap:8px;cursor:pointer;list-style:none;user-select:none}
+.links-cat-title::-webkit-details-marker{display:none}
+.links-cat-title::after{content:'▾';margin-left:auto;font-size:16px;color:rgba(255,255,255,.4);transition:transform .2s}
+details[open]>.links-cat-title::after{transform:rotate(-180deg)}
+.links-body{padding:0 12px 12px}
 .links-grid{display:flex;flex-direction:column;gap:8px}
+.links-subgrid{margin-top:4px}
+.links-subcategory{margin-bottom:8px}
+.links-subcat-title{font-size:11px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase;padding:8px 4px 8px;display:flex;align-items:center;gap:6px;cursor:pointer;list-style:none;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:8px}
+.links-subcat-title::-webkit-details-marker{display:none}
+.links-subcat-title::after{content:'▾';margin-left:auto;font-size:13px;color:rgba(255,255,255,.3);transition:transform .2s}
+details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
 .link-item{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:12px;text-decoration:none;color:inherit;transition:background .18s}
 .link-item:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.25)}
 .link-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
@@ -578,29 +588,42 @@ function renderLinks(){
     return;
   }
   const updatedHtml=LINKS_UPDATED?`<div class="links-updated">最終更新：${LINKS_UPDATED}</div>`:'';
+  const TYPE_MAP={
+    pdf:{icon:'📄',cls:'link-icon-pdf',badge:'PDF',badgeCls:'lt-pdf'},
+    sheet:{icon:'📊',cls:'link-icon-sheet',badge:'スプレッドシート',badgeCls:'lt-sheet'},
+    doc:{icon:'📝',cls:'link-icon-doc',badge:'ドキュメント',badgeCls:'lt-doc'},
+    folder:{icon:'📁',cls:'link-icon-folder',badge:'フォルダ',badgeCls:'lt-folder'},
+    form:{icon:'📋',cls:'link-icon-form',badge:'フォーム',badgeCls:'lt-form'},
+    other:{icon:'📎',cls:'link-icon-other',badge:'ファイル',badgeCls:'lt-other'}
+  };
+  function renderItem(item){
+    const t=TYPE_MAP[item.type]||TYPE_MAP.other;
+    return `<a class="link-item" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">
+      <div class="link-icon ${t.cls}">${t.icon}</div>
+      <div class="link-body">
+        <div class="link-title">${esc(item.title)}</div>
+        ${item.desc?`<div class="link-desc">${esc(item.desc)}</div>`:''}
+      </div>
+      <span class="link-type ${t.badgeCls}">${t.badge}</span>
+    </a>`;
+  }
+  function renderGrid(items){
+    return `<div class="links-grid">${items.map(renderItem).join('')}</div>`;
+  }
   const html=LINKS_DATA.map(cat=>{
-    const items=cat.items.map(item=>{
-      const typeInfo={
-        pdf:{icon:'📄',cls:'link-icon-pdf',badge:'PDF',badgeCls:'lt-pdf'},
-        sheet:{icon:'📊',cls:'link-icon-sheet',badge:'スプレッドシート',badgeCls:'lt-sheet'},
-        doc:{icon:'📝',cls:'link-icon-doc',badge:'ドキュメント',badgeCls:'lt-doc'},
-        folder:{icon:'📁',cls:'link-icon-folder',badge:'フォルダ',badgeCls:'lt-folder'},
-        form:{icon:'📋',cls:'link-icon-form',badge:'フォーム',badgeCls:'lt-form'},
-        other:{icon:'📎',cls:'link-icon-other',badge:'ファイル',badgeCls:'lt-other'}
-      }[item.type]||{icon:'📎',cls:'link-icon-other',badge:'ファイル',badgeCls:'lt-other'};
-      return `<a class="link-item" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">
-        <div class="link-icon ${typeInfo.cls}">${typeInfo.icon}</div>
-        <div class="link-body">
-          <div class="link-title">${esc(item.title)}</div>
-          ${item.desc?`<div class="link-desc">${esc(item.desc)}</div>`:''}
-        </div>
-        <span class="link-type ${typeInfo.badgeCls}">${typeInfo.badge}</span>
-      </a>`;
-    }).join('');
-    return `<div class="links-category">
-      <div class="links-cat-title">${esc(cat.icon)} ${esc(cat.category)}</div>
-      <div class="links-grid">${items}</div>
-    </div>`;
+    let body='';
+    if(cat.items&&cat.items.length) body+=renderGrid(cat.items);
+    if(cat.sub&&cat.sub.length){
+      body+=cat.sub.map(s=>`
+        <details class="links-subcategory" open>
+          <summary class="links-subcat-title">${esc(s.icon||'')} ${esc(s.category)}</summary>
+          <div class="links-subgrid">${renderGrid(s.items)}</div>
+        </details>`).join('');
+    }
+    return `<details class="links-category" open>
+      <summary class="links-cat-title">${esc(cat.icon)} ${esc(cat.category)}</summary>
+      <div class="links-body">${body}</div>
+    </details>`;
   }).join('');
   el.innerHTML=updatedHtml+html;
 }
