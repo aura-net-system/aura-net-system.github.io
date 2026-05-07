@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Google カレンダー 運用ガイド | AURA NET</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="theme-color" content="#1a72c8">
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100vh;overflow-x:hidden}
+.bg-layer{position:fixed;inset:0;z-index:0;background:linear-gradient(145deg,#4fa8f5 0%,#1a72c8 30%,#0d3a7a 65%,#061428 100%)}
+.bg-layer::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(91,191,255,.12) 0%,transparent 60%)}
+
+/* Header */
+header{position:sticky;top:0;z-index:100;background:rgba(6,20,40,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.1);height:56px;display:flex;align-items:center;padding:0 20px;gap:14px}
+.back-btn{color:rgba(255,255,255,.75);font-size:12px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;transition:color .15s;letter-spacing:.02em}
+.back-btn:hover{color:#5bbfff}
+.back-btn::before{content:'←';font-size:14px}
+.hd-title{font-size:13px;font-weight:800;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;letter-spacing:.03em}
+.hd-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.hd-badge{background:rgba(91,191,255,.18);color:#93d5ff;border:1px solid rgba(91,191,255,.3);border-radius:20px;padding:3px 11px;font-size:10px;font-weight:700;letter-spacing:.05em}
+.print-btn{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit}
+.print-btn:hover{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.3)}
+
+/* Layout */
+main{position:relative;z-index:10;max-width:860px;margin:0 auto;padding:28px 16px 80px}
+
+/* Card */
+.doc-card{background:#fff;border-radius:18px;padding:44px 48px;box-shadow:0 12px 60px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.15)}
+@media(max-width:640px){.doc-card{padding:24px 20px;border-radius:14px}}
+
+/* Meta bar */
+.doc-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:11px;color:#94a3b8;margin-bottom:28px;padding-bottom:18px;border-bottom:2px solid #f1f5f9}
+.doc-meta .tag{display:inline-flex;align-items:center;gap:4px;background:#f0f7ff;color:#1a72c8;border:1px solid #dbeafe;border-radius:20px;padding:3px 10px;font-weight:700}
+
+/* ──────── Markdown Typography ──────── */
+.doc-body{color:#1e293b;line-height:1.9;font-size:15px}
+
+/* Headings */
+.doc-body h1{font-size:24px;font-weight:900;color:#061428;margin:0 0 24px;padding-bottom:14px;border-bottom:3px solid #1a72c8;letter-spacing:.02em}
+.doc-body h2{font-size:17px;font-weight:800;color:#fff;margin:36px 0 14px;padding:10px 16px;background:linear-gradient(90deg,#1a72c8,#2f8ce0);border-radius:8px;letter-spacing:.03em;line-height:1.5}
+.doc-body h3{font-size:15px;font-weight:800;color:#0d3a7a;margin:26px 0 10px;padding:6px 12px 6px 14px;background:#f0f7ff;border-left:4px solid #1a72c8;border-radius:0 6px 6px 0}
+.doc-body h4{font-size:14px;font-weight:700;color:#1e40af;margin:18px 0 8px;padding-left:10px;border-left:2px solid #93c5fd;letter-spacing:.02em}
+
+/* Paragraphs & lists */
+.doc-body p{margin:0 0 14px;color:#374151}
+.doc-body ul,.doc-body ol{margin:0 0 14px 22px}
+.doc-body li{margin-bottom:7px;color:#374151}
+.doc-body li::marker{color:#1a72c8;font-weight:700}
+.doc-body ul ul,.doc-body ol ul{margin:6px 0 6px 18px}
+
+/* Table */
+.doc-body table{width:100%;border-collapse:collapse;margin:18px 0;font-size:13.5px;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(26,114,200,.1)}
+.doc-body th{background:linear-gradient(90deg,#1a72c8,#2f8ce0);color:#fff;padding:11px 16px;text-align:left;font-weight:800;font-size:12.5px;letter-spacing:.04em;white-space:nowrap}
+.doc-body td{padding:10px 16px;border-bottom:1px solid #e8eef8;vertical-align:top;color:#374151}
+.doc-body tr:last-child td{border-bottom:none}
+.doc-body tr:nth-child(even) td{background:#f7faff}
+.doc-body tr:hover td{background:#eff6ff;transition:background .1s}
+
+/* Blockquote — styled as info callout */
+.doc-body blockquote{position:relative;border:none;border-radius:10px;padding:14px 18px 14px 48px;margin:0 0 16px;background:#f0f7ff;color:#1e4080;line-height:1.8;font-size:14px}
+.doc-body blockquote::before{content:'ℹ';position:absolute;left:14px;top:14px;font-size:18px;color:#1a72c8;font-weight:900;font-style:normal}
+.doc-body blockquote.warn{background:#fff8ed;color:#78350f}
+.doc-body blockquote.warn::before{content:'⚠';color:#f59e0b}
+.doc-body blockquote p{margin:0;color:inherit}
+.doc-body blockquote strong{color:inherit}
+
+/* Code */
+.doc-body code{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:5px;padding:2px 7px;font-size:12.5px;font-family:'Menlo','Consolas',monospace;color:#1e40af}
+.doc-body pre{background:#1e2d40;border-radius:10px;padding:18px 20px;overflow-x:auto;margin:0 0 16px}
+.doc-body pre code{background:none;border:none;padding:0;color:#93d5ff;font-size:13px}
+
+/* Inline elements */
+.doc-body strong{color:#0d3a7a;font-weight:800}
+.doc-body em{color:#475569;font-style:italic}
+.doc-body hr{border:none;border-top:2px solid #f1f5f9;margin:32px 0}
+.doc-body a{color:#1a72c8;text-decoration:none;border-bottom:1px solid rgba(26,114,200,.3);transition:border-color .15s}
+.doc-body a:hover{border-bottom-color:#1a72c8}
+.doc-body input[type=checkbox]{margin-right:6px;accent-color:#1a72c8;pointer-events:none}
+
+/* Print */
+@media print{
+  .bg-layer,.back-btn,.print-btn,.hd-right{display:none!important}
+  body,header{background:#fff!important}
+  header{position:static;color:#000;border-bottom:2px solid #1a72c8}
+  .hd-title{color:#000!important}
+  .doc-card{box-shadow:none;padding:0}
+  .doc-body h2{background:#1a72c8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<header>
+  <a href="/" class="back-btn">ポータル</a>
+  <span class="hd-title">Google カレンダー 運用ガイド</span>
+  <div class="hd-right">
+    <span class="hd-badge">内部資料</span>
+    <button class="print-btn" onclick="window.print()">印刷</button>
+  </div>
+</header>
+<main>
+  <div class="doc-card">
+    <div class="doc-meta" id="doc-meta"></div>
+    <div class="doc-body" id="doc-body"></div>
+  </div>
+</main>
+<script id="md-src" type="text/x-markdown"># Google カレンダー 運用ガイド
+
+&gt; **Ver.1.0 ／ 2025年8月4日発行　医療法人いなだ医院 社内用**
+
+---
+
+## Googleカレンダーとは？
+
+Googleカレンダーは、予定の管理や共有をクラウド上で行えるツールです。当法人では以下の目的で活用します：
+
+- 会議・研修・面談・当番・施設行事などの**共有予定管理**
+- スタッフ間の**スケジュール調整**
+- 印刷用の予定表出力（白黒）
+
+---
+
+## 基本的な使い方（全職員共通）
+
+### 予定の登録方法
+
+1. カレンダー画面で「**予定を追加**」ボタンをクリック
+2. タイトルを簡潔に記載（例：〇〇委員会、面談：山田さん）
+3. 日時を正確に指定
+4. 必要に応じて、説明欄やゲスト追加を行う
+5. 「**保存**」で完了
+
+---
+
+## 当法人での運用ルールと注意点
+
+### ✅（1）時間の指定は明確に
+
+「午前」「午後」「終日」などのあいまいな表現は極力避けてください。開始時刻・終了時刻を明記することを基本とします。
+
+| NG例 | OK例 |
+|------|------|
+| ❌ 午前中ミーティング | ✅ 9:00〜10:00 医局ミーティング |
+| ❌ 夕方面談 | ✅ 17:00〜17:30 面談：山田さん |
+
+### ✅（2）視認性を重視した入力（印刷・共有対応）
+
+- **白黒印刷を前提**として、視認性の高い予定入力を心がけてください
+- 極力デフォルトの色だけ利用し、スケジュール毎に細かい色変更は控えるようにしてください
+
+&gt; **理由：** 他の共有者から見て視認性が落ちるおそれがあるため
+&gt; ※ 勤務上必要・有用であればその限りではない
+
+### ✅（3）カレンダーの新規作成は禁止
+
+- **個人判断で新しいカレンダーを作成することは禁止**です
+- カレンダーの乱立を防ぐため、法人で定められた共有カレンダーのみを使用してください
+- 登録先が不明な場合は、**統括管理へ確認**をしてください
+
+---
+
+## よくある質問（FAQ）
+
+**Q. 間違って予定を入れてしまったら？**
+→ 編集または削除し、必要に応じて関係者に連絡してください。
+
+**Q. 他人の予定はどこまで見えますか？**
+→ 権限によって表示範囲は異なりますが、「空き／予定あり」「詳細表示」のいずれかです。
+
+---
+
+## お問い合わせ
+
+カレンダーに関する質問・不具合等は、**統括管理者**までご連絡ください。
+
+&gt; 本ガイドの内容は、運用実態や業務上の必要に応じて変更される場合があります。改訂が行われた際には、統括管理より全体アナウンスを行いますので、必ず最新版をご確認ください。</script>
+<script>
+const updated = '2025/8/4';
+const meta = document.getElementById('doc-meta');
+let m = '<span class="tag">📝 内部資料</span>';
+if (updated) m += '<span>最終更新：' + updated + '</span>';
+meta.innerHTML = m;
+
+marked.use({breaks: true, gfm: true});
+const src = document.getElementById('md-src').textContent;
+document.getElementById('doc-body').innerHTML = marked.parse(src);
+document.querySelectorAll('.doc-body input[type=checkbox]').forEach(cb => { cb.disabled = true; });
+
+// Warn blockquote detection (⚠ in first line)
+document.querySelectorAll('.doc-body blockquote').forEach(bq => {
+  if (bq.textContent.includes('⚠') || bq.textContent.includes('注意') || bq.textContent.includes('禁止')) {
+    bq.classList.add('warn');
+  }
+});
+</script>
+</body>
+</html>
