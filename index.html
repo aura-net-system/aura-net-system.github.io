@@ -539,54 +539,57 @@ const storage=firebase.storage();
 
 // ========== 書類・リンク集 ==========
 // ※このデータはClaudeがGoogleドライブを読み取り自動更新します
-const LINKS_UPDATED='2026年5月7日（2回目）';
+const LINKS_UPDATED='2026年5月7日';
 const LINKS_DATA=[
   {
-    category:'接遇マニュアル',icon:'🤝',
+    category:"接遇マニュアル",icon:"🤝",
     items:[
-      {title:'接遇マニュアル【全職員向け】',url:'https://docs.google.com/document/d/1fBLLUR_csiEf360_vxl44JmXwWysuMI3Wanx05-4mWw/edit',type:'doc',desc:'接遇5原則・言葉遣いのルール・クレーム初期対応の基本（全員必読）',updated:'2026/5/6'},
-      {title:'接遇マニュアル【新入職員向け】',url:'https://docs.google.com/document/d/1Pm6FEWWZZXceDUU5mUrpg9j0F0gOgmNhR1WTeiUs0ac/edit',type:'doc',desc:'入職初日から使える接遇の基本・具体的な言い回し例・指揮系統のルール',updated:'2026/5/6'},
-      {title:'接遇マニュアル【管理者用】',url:'https://docs.google.com/document/d/1TSlhz7dFjZ-fcL8XodRDvsEgKx8zfGBxaUasAWWxnU0/edit',type:'doc',desc:'接遇振り返り制度の運用・月次評価基準（4段階）・面談・フィードバックルール',updated:'2026/5/6'},
+      {title:"接遇マニュアル【全職員向け】",url:"https://aura-net-system.github.io/docs/01_接遇/接遇マニュアル_全職員向け.html",type:"doc",desc:"接遇5原則・言葉遣いのルール・クレーム初期対応の基本（全員必読）",updated:"2026/5/6"},
+      {title:"接遇マニュアル【新入職員向け】",url:"https://aura-net-system.github.io/docs/01_接遇/接遇マニュアル_新入職員向け.html",type:"doc",desc:"入職初日から使える接遇の基本・具体的な言い回し例・指揮系統のルール",updated:"2026/5/6"},
+      {title:"接遇マニュアル【管理者用】",url:"https://aura-net-system.github.io/docs/01_接遇/接遇マニュアル_管理者用.html",type:"doc",desc:"接遇振り返り制度の運用・月次評価基準（4段階）・面談・フィードバックルール",updated:"2026/5/6"}
     ]
   },
   {
-    category:'苦情・ハラスメント対応',icon:'📢',
+    category:"苦情・ハラスメント対応",icon:"📢",
     items:[
-      {title:'苦情対応・カスタマーハラスメント防止マニュアル',url:'https://docs.google.com/document/d/1ngh2xrfnCwXEOxHkRI2LJk6fjDF1otRaU2burxBOal0/edit',type:'doc',desc:'苦情・カスハラの分類と対応フロー・5分/15分ルール・毅然とした対応フレーズ集',updated:'2026/5/6'},
-      {title:'苦情・カスハラ対応報告書',url:'https://docs.google.com/document/d/15pWfSGhxSM-kbti75L2ERCUAVtEJtaik7tS1mp37Y_Q/edit',type:'doc',desc:'苦情・カスハラ発生時の記録様式（内容分類・対応経過・結果・スタッフケア確認）',updated:'2026/5/6'},
+      {title:"苦情・カスハラ対応報告書",url:"https://aura-net-system.github.io/docs/02_苦情対応/苦情報告書.html",type:"doc",desc:"苦情・カスハラ発生時の記録様式（内容分類・対応経過・結果・スタッフケア確認）",updated:"2026/5/6"},
+      {title:"苦情対応・カスタマーハラスメント防止マニュアル",url:"https://aura-net-system.github.io/docs/02_苦情対応/苦情対応マニュアル.html",type:"doc",desc:"苦情・カスハラの分類と対応フロー・5分/15分ルール・毅然とした対応フレーズ集",updated:"2026/5/6"}
     ]
   },
   {
-    category:'規定・通達',icon:'📜',
+    category:"規定・通達",icon:"📜",
     items:[
-      {title:'内部通報制度規程',url:'https://docs.google.com/document/d/14zO-WDteYKhaCX8pt6G_psV9OgtIZ-qMBFdAuCAgtyE/edit',type:'doc',desc:'法令違反・ハラスメント等の通報制度の規程・虚偽通報の判断基準・調査フロー（ver.1.1）',updated:'2026/5/7'},
-      {title:'内部通報制度 掲示',url:'https://drive.google.com/file/d/1MD9hr4J2sVhGs52iADHInfkffyAfipbN/view',type:'pdf',desc:'職場掲示用の制度概要・通報窓口（稲田崇志・稲田智子・山下友利）案内',updated:'2026/5/6'},
-      {title:'あなたの声を届ける窓口（内部通報フォーム）',url:'https://docs.google.com/forms/d/e/1FAIpQLSeafk04rm1-KHvGjCzCKKFN8AIvTzjeMtPmx-XTqE0yTnci7A/viewform',type:'form',desc:'内部通報・相談の受付フォーム（匿名可・内容は厳重管理）'},
+      {title:"内部通報制度規程",url:"https://aura-net-system.github.io/docs/03_規定通達/内部通報制度規程.html",type:"doc",desc:"法令違反・ハラスメント等の通報制度の規程・虚偽通報の判断基準・調査フロー（ver.1.1）",updated:"2026/5/7"},
+      {title:"内部通報制度 掲示",url:"https://drive.google.com/file/d/1MD9hr4J2sVhGs52iADHInfkffyAfipbN/view",type:"pdf",desc:"職場掲示用の制度概要・通報窓口（稲田崇志・稲田智子・山下友利）案内",updated:"2026/5/6"},
+      {title:"あなたの声を届ける窓口（内部通報フォーム）",url:"https://docs.google.com/forms/d/e/1FAIpQLSeafk04rm1-KHvGjCzCKKFN8AIvTzjeMtPmx-XTqE0yTnci7A/viewform",type:"form",desc:"内部通報・相談の受付フォーム（匿名可・内容は厳重管理）"}
     ]
   },
   {
-    category:'報告フォーム',icon:'📋',
+    category:"報告フォーム",icon:"📋",
     items:[
-      {title:'問題行動報告フォーム（管理者向け）',url:'https://docs.google.com/forms/d/e/1FAIpQLSdoeI4pCQE4ckLJ4ErubNX1Nklj32t8GIb9dUb1TTyEzQGAUA/viewform',type:'form',desc:'職員の問題行動発生時に管理者が状況・対応を記録・報告するフォーム'},
-      {title:'災害発生時報告書フォーム',url:'https://docs.google.com/forms/d/e/1FAIpQLSdzrus3cBPKYn2p6R27-1FNHRZdJd8jng1A6J8zyirO7_6YBw/viewform',type:'form',desc:'災害・緊急事態発生時の状況・被害・対応内容を記録・報告するフォーム'},
+      {title:"問題行動報告フォーム（管理者向け）",url:"https://docs.google.com/forms/d/e/1FAIpQLSdoeI4pCQE4ckLJ4ErubNX1Nklj32t8GIb9dUb1TTyEzQGAUA/viewform",type:"form",desc:"職員の問題行動発生時に管理者が状況・対応を記録・報告するフォーム"},
+      {title:"災害発生時報告書フォーム",url:"https://docs.google.com/forms/d/e/1FAIpQLSdzrus3cBPKYn2p6R27-1FNHRZdJd8jng1A6J8zyirO7_6YBw/viewform",type:"form",desc:"災害・緊急事態発生時の状況・被害・対応内容を記録・報告するフォーム"}
     ]
   },
   {
-    category:'勤怠・給与システム',icon:'💼',
+    category:"勤怠・給与システム",icon:"💼",
     items:[
-      {title:'マネーフォワードクラウド メールアドレス収集のお願い',url:'https://docs.google.com/document/d/1C7NTDPPpHBRaRGYsDAxnRrb-BVQCKM9qLB7gBNRmcRo/edit',type:'doc',desc:'勤怠申請・電子給与明細受取のためのメールアドレス登録ご案内（2025年6月）',updated:'2026/5/6'},
-      {title:'休暇申請システム 利用案内【医院スタッフ向け】',url:'https://drive.google.com/file/d/1erIGzacf5fF2K5qK6HlBXutd9b93B3HE/view',type:'pdf',desc:'2026年6月分より休暇申請はWebシステムで受付・ログイン方法・締切・注意事項（医院のみ）',updated:'2026/5/7'},
+      {title:"休暇申請システム 利用案内【医院スタッフ向け】",url:"https://drive.google.com/file/d/1erIGzacf5fF2K5qK6HlBXutd9b93B3HE/view",type:"pdf",desc:"2026年6月分より休暇申請はWebシステムで受付・ログイン方法・締切・注意事項（医院のみ）",updated:"2026/5/7"}
+    ],
+    sub:[
+      {category:"システム案内・同意書",icon:"📄",items:[
+        {title:"マネーフォワードクラウド メールアドレス収集のお願い",url:"https://aura-net-system.github.io/docs/06_勤怠給与/01_システム案内/マネーフォワード_メールアドレス収集のお願い.html",type:"doc",desc:"勤怠申請・電子給与明細受取のためのメールアドレス登録ご案内（2025年6月）",updated:"2026/5/6"}
+      ]}
     ]
   },
   {
-    category:'人事・採用制度',icon:'👥',
+    category:"人事・採用制度",icon:"👥",
     items:[
-      {title:'職員紹介制度 要項',url:'https://docs.google.com/document/d/1qAi7HV26ciI9qk8Xe5AlJvY0175z0YTNp6AINE0TesY/edit',type:'doc',desc:'リファラル採用制度の対象職種・報奨金額（常勤・パート3区分）・手続きの流れ',updated:'2026/5/6'},
-      {title:'職員紹介制度 申請書',url:'https://docs.google.com/document/d/13HyVmrcR9YIRUAO5_k_cv6mVy2wu4uS8A5hVzYivggs/edit',type:'doc',desc:'紹介制度利用時の申請書（被紹介者の面接設定前に提出・事務局受付後に採用判定）',updated:'2026/5/6'},
+      {title:"職員紹介制度 申請書",url:"https://aura-net-system.github.io/docs/07_人事採用/職員紹介制度_申請書.html",type:"doc",desc:"紹介制度利用時の申請書（被紹介者の面接設定前に提出・事務局受付後に採用判定）",updated:"2026/5/6"},
+      {title:"職員紹介制度 要項",url:"https://aura-net-system.github.io/docs/07_人事採用/職員紹介制度_要項.html",type:"doc",desc:"リファラル採用制度の対象職種・報奨金額（常勤・パート3区分）・手続きの流れ",updated:"2026/5/6"}
     ]
-  },
+  }
 ];
-
 function renderLinks(){
   const el=document.getElementById('links-container');
   if(!LINKS_DATA.length){
