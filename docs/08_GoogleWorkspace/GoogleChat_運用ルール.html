@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Google Chat 運用ルール | AURA NET</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="theme-color" content="#1a72c8">
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100vh;overflow-x:hidden}
+.bg-layer{position:fixed;inset:0;z-index:0;background:linear-gradient(145deg,#4fa8f5 0%,#1a72c8 30%,#0d3a7a 65%,#061428 100%)}
+.bg-layer::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(91,191,255,.12) 0%,transparent 60%)}
+
+/* Header */
+header{position:sticky;top:0;z-index:100;background:rgba(6,20,40,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.1);height:56px;display:flex;align-items:center;padding:0 20px;gap:14px}
+.back-btn{color:rgba(255,255,255,.75);font-size:12px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;transition:color .15s;letter-spacing:.02em}
+.back-btn:hover{color:#5bbfff}
+.back-btn::before{content:'←';font-size:14px}
+.hd-title{font-size:13px;font-weight:800;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;letter-spacing:.03em}
+.hd-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.hd-badge{background:rgba(91,191,255,.18);color:#93d5ff;border:1px solid rgba(91,191,255,.3);border-radius:20px;padding:3px 11px;font-size:10px;font-weight:700;letter-spacing:.05em}
+.print-btn{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit}
+.print-btn:hover{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.3)}
+
+/* Layout */
+main{position:relative;z-index:10;max-width:860px;margin:0 auto;padding:28px 16px 80px}
+
+/* Card */
+.doc-card{background:#fff;border-radius:18px;padding:44px 48px;box-shadow:0 12px 60px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.15)}
+@media(max-width:640px){.doc-card{padding:24px 20px;border-radius:14px}}
+
+/* Meta bar */
+.doc-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:11px;color:#94a3b8;margin-bottom:28px;padding-bottom:18px;border-bottom:2px solid #f1f5f9}
+.doc-meta .tag{display:inline-flex;align-items:center;gap:4px;background:#f0f7ff;color:#1a72c8;border:1px solid #dbeafe;border-radius:20px;padding:3px 10px;font-weight:700}
+
+/* ──────── Markdown Typography ──────── */
+.doc-body{color:#1e293b;line-height:1.9;font-size:15px}
+
+/* Headings */
+.doc-body h1{font-size:24px;font-weight:900;color:#061428;margin:0 0 24px;padding-bottom:14px;border-bottom:3px solid #1a72c8;letter-spacing:.02em}
+.doc-body h2{font-size:17px;font-weight:800;color:#fff;margin:36px 0 14px;padding:10px 16px;background:linear-gradient(90deg,#1a72c8,#2f8ce0);border-radius:8px;letter-spacing:.03em;line-height:1.5}
+.doc-body h3{font-size:15px;font-weight:800;color:#0d3a7a;margin:26px 0 10px;padding:6px 12px 6px 14px;background:#f0f7ff;border-left:4px solid #1a72c8;border-radius:0 6px 6px 0}
+.doc-body h4{font-size:14px;font-weight:700;color:#1e40af;margin:18px 0 8px;padding-left:10px;border-left:2px solid #93c5fd;letter-spacing:.02em}
+
+/* Paragraphs & lists */
+.doc-body p{margin:0 0 14px;color:#374151}
+.doc-body ul,.doc-body ol{margin:0 0 14px 22px}
+.doc-body li{margin-bottom:7px;color:#374151}
+.doc-body li::marker{color:#1a72c8;font-weight:700}
+.doc-body ul ul,.doc-body ol ul{margin:6px 0 6px 18px}
+
+/* Table */
+.doc-body table{width:100%;border-collapse:collapse;margin:18px 0;font-size:13.5px;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(26,114,200,.1)}
+.doc-body th{background:linear-gradient(90deg,#1a72c8,#2f8ce0);color:#fff;padding:11px 16px;text-align:left;font-weight:800;font-size:12.5px;letter-spacing:.04em;white-space:nowrap}
+.doc-body td{padding:10px 16px;border-bottom:1px solid #e8eef8;vertical-align:top;color:#374151}
+.doc-body tr:last-child td{border-bottom:none}
+.doc-body tr:nth-child(even) td{background:#f7faff}
+.doc-body tr:hover td{background:#eff6ff;transition:background .1s}
+
+/* Blockquote — styled as info callout */
+.doc-body blockquote{position:relative;border:none;border-radius:10px;padding:14px 18px 14px 48px;margin:0 0 16px;background:#f0f7ff;color:#1e4080;line-height:1.8;font-size:14px}
+.doc-body blockquote::before{content:'ℹ';position:absolute;left:14px;top:14px;font-size:18px;color:#1a72c8;font-weight:900;font-style:normal}
+.doc-body blockquote.warn{background:#fff8ed;color:#78350f}
+.doc-body blockquote.warn::before{content:'⚠';color:#f59e0b}
+.doc-body blockquote p{margin:0;color:inherit}
+.doc-body blockquote strong{color:inherit}
+
+/* Code */
+.doc-body code{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:5px;padding:2px 7px;font-size:12.5px;font-family:'Menlo','Consolas',monospace;color:#1e40af}
+.doc-body pre{background:#1e2d40;border-radius:10px;padding:18px 20px;overflow-x:auto;margin:0 0 16px}
+.doc-body pre code{background:none;border:none;padding:0;color:#93d5ff;font-size:13px}
+
+/* Inline elements */
+.doc-body strong{color:#0d3a7a;font-weight:800}
+.doc-body em{color:#475569;font-style:italic}
+.doc-body hr{border:none;border-top:2px solid #f1f5f9;margin:32px 0}
+.doc-body a{color:#1a72c8;text-decoration:none;border-bottom:1px solid rgba(26,114,200,.3);transition:border-color .15s}
+.doc-body a:hover{border-bottom-color:#1a72c8}
+.doc-body input[type=checkbox]{margin-right:6px;accent-color:#1a72c8;pointer-events:none}
+
+/* Print */
+@media print{
+  .bg-layer,.back-btn,.print-btn,.hd-right{display:none!important}
+  body,header{background:#fff!important}
+  header{position:static;color:#000;border-bottom:2px solid #1a72c8}
+  .hd-title{color:#000!important}
+  .doc-card{box-shadow:none;padding:0}
+  .doc-body h2{background:#1a72c8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<header>
+  <a href="/" class="back-btn">ポータル</a>
+  <span class="hd-title">Google Chat 運用ルール</span>
+  <div class="hd-right">
+    <span class="hd-badge">内部資料</span>
+    <button class="print-btn" onclick="window.print()">印刷</button>
+  </div>
+</header>
+<main>
+  <div class="doc-card">
+    <div class="doc-meta" id="doc-meta"></div>
+    <div class="doc-body" id="doc-body"></div>
+  </div>
+</main>
+<script id="md-src" type="text/x-markdown"># Google Chat 運用ルール
+
+&gt; **医療法人いなだ医院 ／ 医療・介護現場における迅速かつ安全な情報共有のために**
+
+---
+
+## 使用対象
+
+- 医療・介護職員（サ高住、小多機、訪問看護、外来など）
+- 医師、管理者、統括責任者
+
+---
+
+## 利用ルール
+
+### 1. 利用端末の制限
+
+- **業務専用端末（法人指定端末）のみ**使用可能
+- 個人スマートフォンでのログインは**禁止**
+
+### 2. 投稿ルール
+
+投稿時は以下の形式を必ず守ること：
+
+```
+【時刻 / 投稿者名】内容
+```
+
+- 対象者は氏名ではなく**「イニシャル」かつ「部屋番号」**で記載
+  - 例：`T.K様 ／ 203号室`
+- 個人の判断による冗長な投稿や**私的連絡は禁止**
+
+### 3. スペース管理
+
+- チャットスペースは**法人管理者が作成**し、現場での削除・編集は不可
+- 新規スペース作成希望時は**統括管理者へ申請**
+
+### 4. 情報の機密性
+
+- 患者情報・症状・バイタル情報などの記載には十分注意
+- 個人情報を含む誤投稿時は**即座に管理者へ報告**し、削除対応
+
+### 5. セキュリティ対策
+
+- **2段階認証を必須**とする
+- ログイン情報の共有禁止
+- パスワードは定期的に変更
+
+### 6. 退職・異動時の処理
+
+- アカウントは管理者が**即日停止**
+
+---
+
+## 注意事項
+
+1. 法人指定端末でのみGoogle Chatを使用します
+2. 患者情報等の機微な内容の取り扱いに注意し、指導を受けたテンプレート・表現を使用します
+3. 投稿においては責任を持ち、投稿内容には十分な配慮を行います
+4. アカウントの貸与・共有は禁止であることを理解しています
+5. 不正使用や情報漏えいが疑われる場合は、直ちに管理者へ報告します</script>
+<script>
+const updated = '2026/5/7';
+const meta = document.getElementById('doc-meta');
+let m = '<span class="tag">📝 内部資料</span>';
+if (updated) m += '<span>最終更新：' + updated + '</span>';
+meta.innerHTML = m;
+
+marked.use({breaks: true, gfm: true});
+const src = document.getElementById('md-src').textContent;
+document.getElementById('doc-body').innerHTML = marked.parse(src);
+document.querySelectorAll('.doc-body input[type=checkbox]').forEach(cb => { cb.disabled = true; });
+
+// Warn blockquote detection (⚠ in first line)
+document.querySelectorAll('.doc-body blockquote').forEach(bq => {
+  if (bq.textContent.includes('⚠') || bq.textContent.includes('注意') || bq.textContent.includes('禁止')) {
+    bq.classList.add('warn');
+  }
+});
+</script>
+</body>
+</html>
