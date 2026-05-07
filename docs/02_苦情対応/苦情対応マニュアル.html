@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>苦情対応・カスタマーハラスメント防止マニュアル | AURA NET</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="theme-color" content="#1a72c8">
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100vh;overflow-x:hidden}
+.bg-layer{position:fixed;inset:0;z-index:0;background:linear-gradient(145deg,#5bbfff 0%,#1a72c8 35%,#0d3a7a 65%,#061428 100%)}
+header{position:sticky;top:0;z-index:100;background:rgba(6,20,40,.68);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.1);height:58px;display:flex;align-items:center;padding:0 20px;gap:14px}
+.back-btn{color:rgba(255,255,255,.72);font-size:13px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;transition:color .15s}
+.back-btn:hover{color:#fff}
+.hd-title{font-size:14px;font-weight:800;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.hd-badge{background:rgba(91,191,255,.2);color:#5bbfff;border:1px solid rgba(91,191,255,.35);border-radius:5px;padding:2px 9px;font-size:10px;font-weight:700;white-space:nowrap;flex-shrink:0}
+main{position:relative;z-index:10;max-width:820px;margin:0 auto;padding:28px 16px 80px}
+.doc-card{background:#fff;border-radius:16px;padding:36px 40px;box-shadow:0 8px 48px rgba(0,0,0,.28)}
+@media(max-width:600px){.doc-card{padding:22px 18px}}
+.doc-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:11px;color:#94a3b8;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #e2e8f0}
+/* Markdown typography */
+.doc-body{color:#1e293b;line-height:1.85;font-size:15px}
+.doc-body h1{font-size:22px;font-weight:800;color:#0d3a7a;margin:0 0 20px;padding-bottom:12px;border-bottom:2px solid #dbeafe}
+.doc-body h2{font-size:17px;font-weight:800;color:#1a4b7a;margin:32px 0 12px;padding:8px 12px;background:#f0f7ff;border-left:4px solid #1a72c8;border-radius:0 6px 6px 0}
+.doc-body h3{font-size:15px;font-weight:700;color:#1e40af;margin:22px 0 8px;padding-left:8px;border-left:2px solid #93c5fd}
+.doc-body h4{font-size:14px;font-weight:700;color:#374151;margin:16px 0 6px}
+.doc-body p{margin:0 0 14px;color:#334155}
+.doc-body ul,.doc-body ol{margin:0 0 14px 20px}
+.doc-body li{margin-bottom:6px;color:#334155}
+.doc-body li::marker{color:#1a72c8;font-weight:700}
+.doc-body table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px;overflow-x:auto;display:block}
+.doc-body th{background:#1a72c8;color:#fff;padding:10px 14px;text-align:left;font-weight:700;font-size:13px;white-space:nowrap}
+.doc-body td{padding:9px 14px;border-bottom:1px solid #e2e8f0;vertical-align:top;color:#334155}
+.doc-body tr:nth-child(even) td{background:#f8fafc}
+.doc-body tr:hover td{background:#eff6ff}
+.doc-body strong{color:#0d3a7a;font-weight:800}
+.doc-body em{color:#475569;font-style:italic}
+.doc-body code{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:2px 6px;font-size:13px;font-family:monospace;color:#334155}
+.doc-body pre{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;overflow-x:auto;margin:0 0 16px}
+.doc-body blockquote{border-left:4px solid #1a72c8;padding:10px 16px;background:#eff6ff;margin:0 0 14px;color:#475569;border-radius:0 8px 8px 0;font-style:italic}
+.doc-body hr{border:none;border-top:2px solid #e2e8f0;margin:28px 0}
+.doc-body a{color:#1a72c8;text-decoration:underline}
+.doc-body a:hover{color:#0d3a7a}
+.doc-body input[type=checkbox]{margin-right:6px;accent-color:#1a72c8;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<header>
+  <a href="/" class="back-btn">← ポータル</a>
+  <span class="hd-title">苦情対応・カスタマーハラスメント防止マニュアル</span>
+  <span class="hd-badge">内部資料</span>
+</header>
+<main>
+  <div class="doc-card">
+    <div class="doc-meta" id="doc-meta"></div>
+    <div class="doc-body" id="doc-body"></div>
+  </div>
+</main>
+<script id="md-src" type="text/x-markdown"># 苦情対応・カスタマーハラスメント防止マニュアル
+
+## 1. 目的と基本方針
+
+**目的：** サービス利用者やその家族からの苦情に対し、組織として適切かつ迅速に対応することで、サービスの質を向上させるとともに、不当な要求やハラスメントから全職員の心身の安全を守る。
+
+**基本方針：**
+- 正当な苦情には真摯に耳を傾け、改善に努める。
+- 不当な要求、暴言、脅迫などのカスタマーハラスメントには、組織として毅然とした態度で臨み、一人で抱え込ませない。
+
+## 2. カスタマーハラスメントの定義
+
+当法人では、利用者や家族等による以下の行為をカスハラと定義します：
+
+- **精神的な攻撃：** 暴言、罵声、屈辱的な発言、人格否定、差別的発言。
+- **過剰な要求：** 契約範囲を超えたサービス（介護保険外の私的な用事など）の強要、医学的根拠のない治療・ケアの要求。
+- **執拗な言動：** 長時間の拘束（電話・面談）、同じ内容の繰り返しの抗議。
+- **物理的な攻撃・脅迫：** 暴力、物品の破壊、SNS等への誹謗中傷の投稿、金銭要求。
+
+## 3. 苦情の分類と判断基準
+
+| 分類 | 内容例 | 対応の方向性 |
+|------|--------|-------------|
+| 正当な苦情 | サービスへの不満、接遇の不備、施設の設備不良 | 謝罪、事実確認、改善案の提示 |
+| 相談・不安 | 診療・ケア内容への不安、料金への疑問 | 丁寧な説明、専門職（看護師・ケアマネ等）への交代 |
+| 不当な要求（カスハラ） | 暴言、長時間拘束、スタッフ個人の指名や攻撃 | 即時打ち切り、組織的対応、法的措置の検討 |
+
+## 4. 現場での対応フロー
+
+### ① 初期対応（全スタッフ共通）
+
+- **傾聴と共感：** まずは相手の話を最後まで聴き、不快な思いをさせたことへの「限定的な謝罪」に留める（「ご不便をおかけし申し訳ございません」等）。
+- **NG行動：** 安易な責任の全否定や、逆に非がないのに何でも認めすぎる謝罪、個人的な感情での言い返しは避ける。
+
+### ② 5分・15分ルールの適用
+
+- **5分ルール（一次対応）：** 一般スタッフの対応は5分を目安とし、解決しない場合や暴言が始まった場合は即座に上長へ報告・交代する。
+- **15分ルール（管理者対応）：** 責任者による対応も15分を目安とし、進展がない場合は「本日はこれ以上お話しできません」と打ち切る。
+
+### ③ 記録と報告
+
+対応後は必ず「苦情・カスタマーハラスメント対応報告書」を記録し、管理者へ報告する。
+
+## 5. カスハラへの毅然としたフレーズ集
+
+| 場面 | 対応フレーズ |
+|------|-------------|
+| 暴言に対して | 「そのようなお言葉でお話しされるのでしたら、対応を終了させていただきます」 |
+| 長時間拘束に対して | 「他のお客様への対応もございますので、本日はこれで失礼いたします」 |
+| 不当要求に対して | 「法人の規定（および医療安全・介護保険制度）上、そのご要求にはお応えできかねます」 |
+
+## 6. スタッフの保護とアフターケア
+
+- **一人で対応させない：** カスハラが予想される面談等は必ず複数名で対応する。
+- **メンタルケア：** 強いストレスを感じる対応の後は、5分間の休憩（クールダウン）を取り、上司がヒアリングを行う。
+- **法的措置：** 身体的危害、業務妨害、執拗な嫌がらせに対しては、法人として警察への通報や顧問弁護士を通じた法的措置を講じる。
+
+---
+
+&gt; **重要な心得：** 医療・介護従事者は「奉仕の心」が求められますが、それは自己犠牲を意味しません。スタッフの尊厳を守ることは、安全なサービスを提供し続けるための法人としての責務です。</script>
+<script>
+const updated = '2026/5/6';
+const meta = document.getElementById('doc-meta');
+let m = '<span>📝 内部資料</span>';
+if (updated) m += '<span>更新: ' + updated + '</span>';
+meta.innerHTML = m;
+marked.use({breaks: true, gfm: true});
+const src = document.getElementById('md-src').textContent;
+document.getElementById('doc-body').innerHTML = marked.parse(src);
+document.querySelectorAll('.doc-body input[type=checkbox]').forEach(cb => { cb.disabled = true; });
+</script>
+</body>
+</html>
