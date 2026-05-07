@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>遅刻時の対応について | AURA NET</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="theme-color" content="#1a72c8">
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100vh;overflow-x:hidden}
+.bg-layer{position:fixed;inset:0;z-index:0;background:linear-gradient(145deg,#4fa8f5 0%,#1a72c8 30%,#0d3a7a 65%,#061428 100%)}
+.bg-layer::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(91,191,255,.12) 0%,transparent 60%)}
+
+/* Header */
+header{position:sticky;top:0;z-index:100;background:rgba(6,20,40,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(255,255,255,.1);height:56px;display:flex;align-items:center;padding:0 20px;gap:14px}
+.back-btn{color:rgba(255,255,255,.75);font-size:12px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;transition:color .15s;letter-spacing:.02em}
+.back-btn:hover{color:#5bbfff}
+.back-btn::before{content:'←';font-size:14px}
+.hd-title{font-size:13px;font-weight:800;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;letter-spacing:.03em}
+.hd-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.hd-badge{background:rgba(91,191,255,.18);color:#93d5ff;border:1px solid rgba(91,191,255,.3);border-radius:20px;padding:3px 11px;font-size:10px;font-weight:700;letter-spacing:.05em}
+.print-btn{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit}
+.print-btn:hover{background:rgba(255,255,255,.15);color:#fff;border-color:rgba(255,255,255,.3)}
+
+/* Layout */
+main{position:relative;z-index:10;max-width:860px;margin:0 auto;padding:28px 16px 80px}
+
+/* Card */
+.doc-card{background:#fff;border-radius:18px;padding:44px 48px;box-shadow:0 12px 60px rgba(0,0,0,.3),0 2px 8px rgba(0,0,0,.15)}
+@media(max-width:640px){.doc-card{padding:24px 20px;border-radius:14px}}
+
+/* Meta bar */
+.doc-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:11px;color:#94a3b8;margin-bottom:28px;padding-bottom:18px;border-bottom:2px solid #f1f5f9}
+.doc-meta .tag{display:inline-flex;align-items:center;gap:4px;background:#f0f7ff;color:#1a72c8;border:1px solid #dbeafe;border-radius:20px;padding:3px 10px;font-weight:700}
+
+/* ──────── Markdown Typography ──────── */
+.doc-body{color:#1e293b;line-height:1.9;font-size:15px}
+
+/* Headings */
+.doc-body h1{font-size:24px;font-weight:900;color:#061428;margin:0 0 24px;padding-bottom:14px;border-bottom:3px solid #1a72c8;letter-spacing:.02em}
+.doc-body h2{font-size:17px;font-weight:800;color:#fff;margin:36px 0 14px;padding:10px 16px;background:linear-gradient(90deg,#1a72c8,#2f8ce0);border-radius:8px;letter-spacing:.03em;line-height:1.5}
+.doc-body h3{font-size:15px;font-weight:800;color:#0d3a7a;margin:26px 0 10px;padding:6px 12px 6px 14px;background:#f0f7ff;border-left:4px solid #1a72c8;border-radius:0 6px 6px 0}
+.doc-body h4{font-size:14px;font-weight:700;color:#1e40af;margin:18px 0 8px;padding-left:10px;border-left:2px solid #93c5fd;letter-spacing:.02em}
+
+/* Paragraphs & lists */
+.doc-body p{margin:0 0 14px;color:#374151}
+.doc-body ul,.doc-body ol{margin:0 0 14px 22px}
+.doc-body li{margin-bottom:7px;color:#374151}
+.doc-body li::marker{color:#1a72c8;font-weight:700}
+.doc-body ul ul,.doc-body ol ul{margin:6px 0 6px 18px}
+
+/* Table */
+.doc-body table{width:100%;border-collapse:collapse;margin:18px 0;font-size:13.5px;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(26,114,200,.1)}
+.doc-body th{background:linear-gradient(90deg,#1a72c8,#2f8ce0);color:#fff;padding:11px 16px;text-align:left;font-weight:800;font-size:12.5px;letter-spacing:.04em;white-space:nowrap}
+.doc-body td{padding:10px 16px;border-bottom:1px solid #e8eef8;vertical-align:top;color:#374151}
+.doc-body tr:last-child td{border-bottom:none}
+.doc-body tr:nth-child(even) td{background:#f7faff}
+.doc-body tr:hover td{background:#eff6ff;transition:background .1s}
+
+/* Blockquote — styled as info callout */
+.doc-body blockquote{position:relative;border:none;border-radius:10px;padding:14px 18px 14px 48px;margin:0 0 16px;background:#f0f7ff;color:#1e4080;line-height:1.8;font-size:14px}
+.doc-body blockquote::before{content:'ℹ';position:absolute;left:14px;top:14px;font-size:18px;color:#1a72c8;font-weight:900;font-style:normal}
+.doc-body blockquote.warn{background:#fff8ed;color:#78350f}
+.doc-body blockquote.warn::before{content:'⚠';color:#f59e0b}
+.doc-body blockquote p{margin:0;color:inherit}
+.doc-body blockquote strong{color:inherit}
+
+/* Code */
+.doc-body code{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:5px;padding:2px 7px;font-size:12.5px;font-family:'Menlo','Consolas',monospace;color:#1e40af}
+.doc-body pre{background:#1e2d40;border-radius:10px;padding:18px 20px;overflow-x:auto;margin:0 0 16px}
+.doc-body pre code{background:none;border:none;padding:0;color:#93d5ff;font-size:13px}
+
+/* Inline elements */
+.doc-body strong{color:#0d3a7a;font-weight:800}
+.doc-body em{color:#475569;font-style:italic}
+.doc-body hr{border:none;border-top:2px solid #f1f5f9;margin:32px 0}
+.doc-body a{color:#1a72c8;text-decoration:none;border-bottom:1px solid rgba(26,114,200,.3);transition:border-color .15s}
+.doc-body a:hover{border-bottom-color:#1a72c8}
+.doc-body input[type=checkbox]{margin-right:6px;accent-color:#1a72c8;pointer-events:none}
+
+/* Print */
+@media print{
+  .bg-layer,.back-btn,.print-btn,.hd-right{display:none!important}
+  body,header{background:#fff!important}
+  header{position:static;color:#000;border-bottom:2px solid #1a72c8}
+  .hd-title{color:#000!important}
+  .doc-card{box-shadow:none;padding:0}
+  .doc-body h2{background:#1a72c8!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<header>
+  <a href="/" class="back-btn">ポータル</a>
+  <span class="hd-title">遅刻時の対応について</span>
+  <div class="hd-right">
+    <span class="hd-badge">内部資料</span>
+    <button class="print-btn" onclick="window.print()">印刷</button>
+  </div>
+</header>
+<main>
+  <div class="doc-card">
+    <div class="doc-meta" id="doc-meta"></div>
+    <div class="doc-body" id="doc-body"></div>
+  </div>
+</main>
+<script id="md-src" type="text/x-markdown"># 遅刻時の対応について
+
+&gt; **ver.1.1 ／ 2025年7月15日　医療法人いなだ医院**
+
+---
+
+## 基本的な考え方
+
+遅刻は、組織人・社会人として原則として許されるべきものではなく、**懲戒や減俸評価の対象となり得る重大な勤務違反**です。やむを得ない事情を除き、正当な理由のない遅刻は業務に支障を及ぼすため、原則として評価査定への反映および減俸等の対応を行います。
+
+---
+
+## 公共的な理由による遅刻（原則：免責）
+
+以下の不可抗力による遅刻については、原則として勤務扱いとし、懲戒・減俸の対象としません。
+
+| 理由 | 必要書類 |
+|------|---------|
+| 公共交通機関の遅延 | 遅延証明書 |
+| 地震・台風・大雪等の自然災害 | 原則不要 |
+| 大規模事故・インフラ障害 | 原則不要 |
+| 同居家族（子ども・被介護者等）の急な体調不良による受診付き添い | 診療明細書・受診票、または申立書 |
+| その他、法人がやむを得ないと判断した社会的要因 | 証明書類（必要に応じて） |
+
+&gt; **注意：** 書類が提出された場合でも、内容により法人がやむを得ない事情と認めない場合は、有給使用の対象外となります。
+
+---
+
+## 個人的な理由による遅刻（原則：懲戒対象）
+
+以下のような理由による遅刻は自己都合と見なし、原則として**勤怠評価への影響および減俸処理**を行います。
+
+**主な該当例：**
+- 寝坊、目覚ましミス、支度の遅れ
+- 子どもの送迎や家庭内トラブル
+- 私的な通院や服薬忘れ、軽微な体調不良
+- 銀行・役所・買い物等の私事
+- スマホの充電切れ、通知設定ミス
+
+**通勤車両関連で多い遅刻例：**
+- 渋滞予測の甘さ（朝の混雑回避が不十分）
+- 悪天候時に備えた出発準備不足
+- 燃料補給忘れ・エンジントラブルの未整備
+- 予測されていた天候悪化への対応遅れ
+
+&gt; **補足：** 自然災害レベルの影響（道路封鎖、インフラ被害等）は「公共的理由」に該当することがありますが、事前に予測可能な天候・交通状況への準備不足は個人的理由として扱います。
+
+---
+
+## 有給休暇による遅刻対応（例外的運用）
+
+遅刻に対して有給を使用する場合は、あくまで例外的対応とし、**法人の承認を前提**とします。
+
+- 利用は **1時間単位** とし、1時間未満の遅刻は切り上げ（例：35分 → 1時間消化）
+- 有給残数が不足している場合は減俸対象
+- 希望者は所定の様式により事前または当日申請を行うこと
+- 法人が承認しない限り、有給扱いとはなりません
+- 遅刻と同時に有給申請を行う場合には、**医師の診断書・通院証明書等の証明書を添付提出**してください
+
+---
+
+## 有給申請に伴う出勤放棄等への対応
+
+遅刻に対して有給を申請しながら、その後に出勤しないケースは**有給制度の趣旨に反する重大な勤務態度違反**と判断します。
+
+- 「有給を取るから出勤しなくてよい」という考え方は誤りです
+- このような行為が確認された場合には、**懲戒処分の対象**とします
+- 再発者に対しては、今後の有給による遅刻処理の承認を一切行いません
+
+---
+
+## 申告・記録の手続き
+
+1. 遅刻が判明した時点で、速やかに上司または管理者に**口頭報告**してください
+2. 管理者はその旨を統括もしくは代表に報告をしてください
+3. 勤怠記録には、遅刻理由および処理希望区分（懲戒 ／ 有給希望）を明記してください
+4. **虚偽・無断報告が確認された場合は、厳重な懲戒処分の対象**とします
+
+---
+
+## 補足
+
+- 軽微な遅刻であっても、繰り返される場合は評価・処遇に反映されます
+- 法人は、全職員に対して公平・一律な基準で対応いたします</script>
+<script>
+const updated = '2025/7/15';
+const meta = document.getElementById('doc-meta');
+let m = '<span class="tag">📝 内部資料</span>';
+if (updated) m += '<span>最終更新：' + updated + '</span>';
+meta.innerHTML = m;
+
+marked.use({breaks: true, gfm: true});
+const src = document.getElementById('md-src').textContent;
+document.getElementById('doc-body').innerHTML = marked.parse(src);
+document.querySelectorAll('.doc-body input[type=checkbox]').forEach(cb => { cb.disabled = true; });
+
+// Warn blockquote detection (⚠ in first line)
+document.querySelectorAll('.doc-body blockquote').forEach(bq => {
+  if (bq.textContent.includes('⚠') || bq.textContent.includes('注意') || bq.textContent.includes('禁止')) {
+    bq.classList.add('warn');
+  }
+});
+</script>
+</body>
+</html>
