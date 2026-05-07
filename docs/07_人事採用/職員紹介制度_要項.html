@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>職員紹介制度 要項 | AURA NET</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="theme-color" content="#1a72c8">
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100vh;overflow-x:hidden}
+.bg-layer{position:fixed;inset:0;z-index:0;background:linear-gradient(145deg,#5bbfff 0%,#1a72c8 35%,#0d3a7a 65%,#061428 100%)}
+header{position:sticky;top:0;z-index:100;background:rgba(6,20,40,.68);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.1);height:58px;display:flex;align-items:center;padding:0 20px;gap:14px}
+.back-btn{color:rgba(255,255,255,.72);font-size:13px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;transition:color .15s}
+.back-btn:hover{color:#fff}
+.hd-title{font-size:14px;font-weight:800;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.hd-badge{background:rgba(91,191,255,.2);color:#5bbfff;border:1px solid rgba(91,191,255,.35);border-radius:5px;padding:2px 9px;font-size:10px;font-weight:700;white-space:nowrap;flex-shrink:0}
+main{position:relative;z-index:10;max-width:820px;margin:0 auto;padding:28px 16px 80px}
+.doc-card{background:#fff;border-radius:16px;padding:36px 40px;box-shadow:0 8px 48px rgba(0,0,0,.28)}
+@media(max-width:600px){.doc-card{padding:22px 18px}}
+.doc-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:11px;color:#94a3b8;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #e2e8f0}
+/* Markdown typography */
+.doc-body{color:#1e293b;line-height:1.85;font-size:15px}
+.doc-body h1{font-size:22px;font-weight:800;color:#0d3a7a;margin:0 0 20px;padding-bottom:12px;border-bottom:2px solid #dbeafe}
+.doc-body h2{font-size:17px;font-weight:800;color:#1a4b7a;margin:32px 0 12px;padding:8px 12px;background:#f0f7ff;border-left:4px solid #1a72c8;border-radius:0 6px 6px 0}
+.doc-body h3{font-size:15px;font-weight:700;color:#1e40af;margin:22px 0 8px;padding-left:8px;border-left:2px solid #93c5fd}
+.doc-body h4{font-size:14px;font-weight:700;color:#374151;margin:16px 0 6px}
+.doc-body p{margin:0 0 14px;color:#334155}
+.doc-body ul,.doc-body ol{margin:0 0 14px 20px}
+.doc-body li{margin-bottom:6px;color:#334155}
+.doc-body li::marker{color:#1a72c8;font-weight:700}
+.doc-body table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px;overflow-x:auto;display:block}
+.doc-body th{background:#1a72c8;color:#fff;padding:10px 14px;text-align:left;font-weight:700;font-size:13px;white-space:nowrap}
+.doc-body td{padding:9px 14px;border-bottom:1px solid #e2e8f0;vertical-align:top;color:#334155}
+.doc-body tr:nth-child(even) td{background:#f8fafc}
+.doc-body tr:hover td{background:#eff6ff}
+.doc-body strong{color:#0d3a7a;font-weight:800}
+.doc-body em{color:#475569;font-style:italic}
+.doc-body code{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:2px 6px;font-size:13px;font-family:monospace;color:#334155}
+.doc-body pre{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;overflow-x:auto;margin:0 0 16px}
+.doc-body blockquote{border-left:4px solid #1a72c8;padding:10px 16px;background:#eff6ff;margin:0 0 14px;color:#475569;border-radius:0 8px 8px 0;font-style:italic}
+.doc-body hr{border:none;border-top:2px solid #e2e8f0;margin:28px 0}
+.doc-body a{color:#1a72c8;text-decoration:underline}
+.doc-body a:hover{color:#0d3a7a}
+.doc-body input[type=checkbox]{margin-right:6px;accent-color:#1a72c8;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<header>
+  <a href="/" class="back-btn">← ポータル</a>
+  <span class="hd-title">職員紹介制度 要項</span>
+  <span class="hd-badge">内部資料</span>
+</header>
+<main>
+  <div class="doc-card">
+    <div class="doc-meta" id="doc-meta"></div>
+    <div class="doc-body" id="doc-body"></div>
+  </div>
+</main>
+<script id="md-src" type="text/x-markdown"># リファラル採用（職員紹介）制度 運用規定
+
+2026/03/02 ver1.2（改訂版）
+
+## 1. 制度の目的
+
+現職員のネットワークを活用し、信頼性の高い人材を安定的に採用・定着させることを目的とする。
+
+## 2. 対象職種（募集職種）
+
+以下の職種を対象とする。
+
+- 看護師
+- 介護福祉士
+- 実務者研修修了者、初任者研修修了者（以下、ヘルパー）
+- 医療事務
+- 調理師
+- 対象職員：常勤職員およびパート職員
+
+## 3. 紹介対象者の条件
+
+以下のすべてを満たす必要がある。
+
+1. 当法人に紹介会社等を経由せず直接応募し、入職した者
+2. 常勤またはパート職員として採用された者
+3. 採用後、3ヶ月以上または6ヶ月以上継続して勤務した者
+4. 採用面接前に、紹介者が所定の「紹介申請書」を提出していること
+
+&gt; **判断基準：** 勤務時間・日数については、入職時の雇用契約内容に基づき判断する。
+
+---
+
+## 4. 報奨金（インセンティブ）について
+
+### 4-1. 常勤職員として採用された場合
+
+| 職種 | 総額 | 3ヶ月継続勤務時 | 6ヶ月継続勤務時 |
+|------|------|---------------|---------------|
+| 看護師 | 60,000円 | 30,000円 | 30,000円 |
+| 介護福祉士 | 50,000円 | 20,000円 | 30,000円 |
+| ヘルパー・医療事務・調理師 | 30,000円 | 10,000円 | 20,000円 |
+
+### 4-2. パート職員として採用された場合（三段階区分）
+
+パート職員の支給額は、雇用契約上の「週所定労働時間」により以下の3区分とする。
+
+#### 【区分A】週30時間以上（常勤の2/3相当）
+
+| 職種 | 総額 | 3ヶ月継続勤務時 | 6ヶ月継続勤務時 |
+|------|------|---------------|---------------|
+| 看護師 | 40,000円 | 20,000円 | 20,000円 |
+| 介護福祉士 | 33,000円 | 13,000円 | 20,000円 |
+| ヘルパー・医療事務・調理師 | 20,000円 | 7,000円 | 13,000円 |
+
+#### 【区分B】週20時間以上 30時間未満（常勤の1/2相当）
+
+| 職種 | 総額 | 3ヶ月継続勤務時 | 6ヶ月継続勤務時 |
+|------|------|---------------|---------------|
+| 看護師 | 30,000円 | 15,000円 | 15,000円 |
+| 介護福祉士 | 25,000円 | 10,000円 | 15,000円 |
+| ヘルパー・医療事務・調理師 | 15,000円 | 5,000円 | 10,000円 |
+
+#### 【区分C】週20時間未満（常勤の1/4相当）
+
+| 職種 | 総額 | 3ヶ月継続勤務時 | 6ヶ月継続勤務時 |
+|------|------|---------------|---------------|
+| 看護師 | 15,000円 | 7,500円 | 7,500円 |
+| 介護福祉士 | 12,500円 | 5,000円 | 7,500円 |
+| ヘルパー・医療事務・調理師 | 7,500円 | 2,500円 | 5,000円 |
+
+---
+
+## 5. 報奨金の支給条件
+
+### 5-1. 継続勤務期間と支給額
+
+- 3ヶ月以上勤務した場合：規定の「3ヶ月分」を支給
+- 6ヶ月以上勤務した場合：さらに規定の「6ヶ月分」を支給
+
+### 5-2. 退職時の取り扱い
+
+- 3ヶ月未満で退職した場合：報奨金の支給は行わない。
+- 3ヶ月以上かつ6ヶ月未満で退職した場合：3ヶ月分のみ支給し、6ヶ月分は支給しない。
+
+## 6. 留意事項・その他要件
+
+- 同一人物に対する紹介が複数名からあった場合は、最も早く紹介申請書が受理された者を紹介者とみなす。
+- 報奨金は給与課税（一時金）対象として処理する。
+- 登録ヘルパー等、雇用契約を伴わない（または極めて不定期な）勤務形態は本制度の対象外とする。
+- 紹介区分（A〜C）は原則として入職時の契約時間に基づき決定する。
+
+## 7. 手続きの流れ
+
+1. **申請：** 紹介者が候補者を見つけ、面接設定前に「紹介申請書」を提出。
+2. **受付：** 人事部門または施設管理者が申請を受付・記録。
+3. **判定：** 被紹介者の入職から3ヶ月・6ヶ月経過時の在籍状況を確認。
+4. **支給：** 支給要件を満たした翌月、給与と併せて紹介者へ報奨金を支給。</script>
+<script>
+const updated = '2026/5/6';
+const meta = document.getElementById('doc-meta');
+let m = '<span>📝 内部資料</span>';
+if (updated) m += '<span>更新: ' + updated + '</span>';
+meta.innerHTML = m;
+marked.use({breaks: true, gfm: true});
+const src = document.getElementById('md-src').textContent;
+document.getElementById('doc-body').innerHTML = marked.parse(src);
+document.querySelectorAll('.doc-body input[type=checkbox]').forEach(cb => { cb.disabled = true; });
+</script>
+</body>
+</html>
