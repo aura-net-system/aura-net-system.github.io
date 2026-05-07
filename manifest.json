@@ -1,0 +1,20 @@
+{
+  "name": "医療法人いなだ医院 ポータル",
+  "short_name": "いなだ医院",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-192.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d3a7a",
+  "theme_color": "#1a72c8"
+}
