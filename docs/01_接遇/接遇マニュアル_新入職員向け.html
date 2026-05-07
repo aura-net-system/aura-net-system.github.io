@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>接遇マニュアル【新入職員向け】 | AURA NET</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="theme-color" content="#1a72c8">
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100vh;overflow-x:hidden}
+.bg-layer{position:fixed;inset:0;z-index:0;background:linear-gradient(145deg,#5bbfff 0%,#1a72c8 35%,#0d3a7a 65%,#061428 100%)}
+header{position:sticky;top:0;z-index:100;background:rgba(6,20,40,.68);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.1);height:58px;display:flex;align-items:center;padding:0 20px;gap:14px}
+.back-btn{color:rgba(255,255,255,.72);font-size:13px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;transition:color .15s}
+.back-btn:hover{color:#fff}
+.hd-title{font-size:14px;font-weight:800;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.hd-badge{background:rgba(91,191,255,.2);color:#5bbfff;border:1px solid rgba(91,191,255,.35);border-radius:5px;padding:2px 9px;font-size:10px;font-weight:700;white-space:nowrap;flex-shrink:0}
+main{position:relative;z-index:10;max-width:820px;margin:0 auto;padding:28px 16px 80px}
+.doc-card{background:#fff;border-radius:16px;padding:36px 40px;box-shadow:0 8px 48px rgba(0,0,0,.28)}
+@media(max-width:600px){.doc-card{padding:22px 18px}}
+.doc-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:11px;color:#94a3b8;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #e2e8f0}
+/* Markdown typography */
+.doc-body{color:#1e293b;line-height:1.85;font-size:15px}
+.doc-body h1{font-size:22px;font-weight:800;color:#0d3a7a;margin:0 0 20px;padding-bottom:12px;border-bottom:2px solid #dbeafe}
+.doc-body h2{font-size:17px;font-weight:800;color:#1a4b7a;margin:32px 0 12px;padding:8px 12px;background:#f0f7ff;border-left:4px solid #1a72c8;border-radius:0 6px 6px 0}
+.doc-body h3{font-size:15px;font-weight:700;color:#1e40af;margin:22px 0 8px;padding-left:8px;border-left:2px solid #93c5fd}
+.doc-body h4{font-size:14px;font-weight:700;color:#374151;margin:16px 0 6px}
+.doc-body p{margin:0 0 14px;color:#334155}
+.doc-body ul,.doc-body ol{margin:0 0 14px 20px}
+.doc-body li{margin-bottom:6px;color:#334155}
+.doc-body li::marker{color:#1a72c8;font-weight:700}
+.doc-body table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px;overflow-x:auto;display:block}
+.doc-body th{background:#1a72c8;color:#fff;padding:10px 14px;text-align:left;font-weight:700;font-size:13px;white-space:nowrap}
+.doc-body td{padding:9px 14px;border-bottom:1px solid #e2e8f0;vertical-align:top;color:#334155}
+.doc-body tr:nth-child(even) td{background:#f8fafc}
+.doc-body tr:hover td{background:#eff6ff}
+.doc-body strong{color:#0d3a7a;font-weight:800}
+.doc-body em{color:#475569;font-style:italic}
+.doc-body code{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:2px 6px;font-size:13px;font-family:monospace;color:#334155}
+.doc-body pre{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;overflow-x:auto;margin:0 0 16px}
+.doc-body blockquote{border-left:4px solid #1a72c8;padding:10px 16px;background:#eff6ff;margin:0 0 14px;color:#475569;border-radius:0 8px 8px 0;font-style:italic}
+.doc-body hr{border:none;border-top:2px solid #e2e8f0;margin:28px 0}
+.doc-body a{color:#1a72c8;text-decoration:underline}
+.doc-body a:hover{color:#0d3a7a}
+.doc-body input[type=checkbox]{margin-right:6px;accent-color:#1a72c8;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<header>
+  <a href="/" class="back-btn">← ポータル</a>
+  <span class="hd-title">接遇マニュアル【新入職員向け】</span>
+  <span class="hd-badge">内部資料</span>
+</header>
+<main>
+  <div class="doc-card">
+    <div class="doc-meta" id="doc-meta"></div>
+    <div class="doc-body" id="doc-body"></div>
+  </div>
+</main>
+<script id="md-src" type="text/x-markdown"># 接遇マニュアル【新入職員向けオリエンテーション版】
+
+医療法人 いなだ医院（2026年2月1日改訂）
+
+## ようこそ！まずはこれだけ覚えてください
+
+この資料は、入職後すぐに実践できる接遇の基本をまとめたものです。初日から使える具体例を中心に解説します。
+
+## 1. あなたの仕事の意味を知ろう
+
+- **私たちが目指すこと：** 介護を通してご利用者様の生きがいや温もりのある生活を支え、安心して暮らせる地域を実現します。
+- **「おもてなす」とは：** 心を込めた対応、温かい気持ちで接すること。これが現場で最も大切なことです。
+- **あなたの立場：** 専門職として人生の大先輩に敬意を払い、法人の代表としての自覚を持って行動してください。
+
+## 2. 接遇の5原則【初日から実践】
+
+1. **挨拶：** 自分から先に、心と体を相手に向けて行います。
+2. **身だしなみ：** 清潔な制服、短い爪（ネイル禁止）、業務中の装飾品（結婚指輪以外）は不可。
+3. **表情・笑顔：** 穏やかで親しみやすい表情を基本とし、マスク越しでも目元で笑顔を伝えます。
+4. **態度・立ち居振る舞い：** 壁への寄りかかり、腕組み、ポケットに手を入れる姿勢は厳禁です。
+5. **言葉遣い：** 常に「です・ます調」を使い、全員を「〇〇さん」と呼びます。
+
+## 3. 職員同士の接遇と「報告・相談」のルール
+
+良好なチームケアのため、職員間でもプロとしての接遇を徹底します。
+
+- **職員間マナー：** 挨拶を徹底し、「ありがとうございます」「お疲れ様です」を積極的に伝えます。
+- **私事の禁止：** 利用者の前で、職員同士の個人的な雑談や大声で笑い合うことは慎んでください。
+- **相互扶助：** 困っている職員がいれば声をかけ、チームで業務を支えます。
+
+### 【重要】指導と報告の仕組み（指揮系統の遵守）
+
+当法人では、円滑な組織運営のために以下のルールを定めています。
+
+- **上司の定義：** 当マニュアルでいう「上司」とは、組織図上の職位（役職）がついている管理者・リーダーを指します。勤続年数が長い、あるいは年齢が上であるといった「先輩・ベテラン」とは区別してください。
+- **報告の徹底：** 他の職員の不適切な接遇を見かけたり、利用者から苦情を受けたりした場合は、自分の判断で動かず、必ず職位上の上司へ報告してください。
+- **指導のルート：** 接遇に関する具体的な指摘や指導は、原則として職位上の上司から対象職員へ行われます。
+- **新人としての注意：** 先輩職員から個人的な感情に基づく注意や、組織のルールから外れた指示を受けた場合も、まずは職位上の上司（管理者）に相談してください。
+
+## 4. 今日から使える言葉遣い【具体例】
+
+| 場面 | 推奨表現 |
+|------|----------|
+| 食事 | 「〇〇さん、お食事のご用意ができました」 |
+| トイレ | 「お手洗いにご案内しましょうか」 |
+| 待機 | 「少々お待ちいただけますか」「5分ほどお待ちください」 |
+| 返事 | 「はい、かしこまりました」「承知いたしました」 |
+
+## 5. 絶対に使ってはいけない言葉
+
+以下の表現は虐待に該当する可能性があるため、**絶対に使用しないでください。**
+
+- **命令・否定：** 「早くして」「ダメ」「違う」
+- **子供扱い：** 「いい子」「偉いね」「おばあちゃん」
+- **尊厳の欠如：** 「どうせ忘れるから」「また言ってる」
+
+## 6. 困ったときの対応
+
+- **わからないとき：** 勝手に判断せず、「わからない」と正直に伝え、先輩や上司に確認してください。
+- **クレームを受けたら：** 相手の話を最後まで聴き（傾聴）、心情への謝罪をした上で、すぐに管理者に報告してください。
+
+## 7. 迷ったときの判断基準
+
+&gt; 「自分が利用者だったら、この対応をされて嫌ではないか？」  
+&gt; 「自分の大切な家族が、この態度で接されたらどう感じるか？」  
+&gt; 少しでも「嫌だ」と感じるなら、その言動は不適切です。
+
+---
+
+**【相談・報告窓口】** 接遇に関する不安や、現場での困りごとは、いつでも**直属の管理者（職位上の上司）** または法人本部人事担当まで連絡してください。</script>
+<script>
+const updated = '2026/5/6';
+const meta = document.getElementById('doc-meta');
+let m = '<span>📝 内部資料</span>';
+if (updated) m += '<span>更新: ' + updated + '</span>';
+meta.innerHTML = m;
+marked.use({breaks: true, gfm: true});
+const src = document.getElementById('md-src').textContent;
+document.getElementById('doc-body').innerHTML = marked.parse(src);
+document.querySelectorAll('.doc-body input[type=checkbox]').forEach(cb => { cb.disabled = true; });
+</script>
+</body>
+</html>
