@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>接遇マニュアル【全職員向け】 | AURA NET</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="theme-color" content="#1a72c8">
+<script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100vh;overflow-x:hidden}
+.bg-layer{position:fixed;inset:0;z-index:0;background:linear-gradient(145deg,#5bbfff 0%,#1a72c8 35%,#0d3a7a 65%,#061428 100%)}
+header{position:sticky;top:0;z-index:100;background:rgba(6,20,40,.68);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.1);height:58px;display:flex;align-items:center;padding:0 20px;gap:14px}
+.back-btn{color:rgba(255,255,255,.72);font-size:13px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;transition:color .15s}
+.back-btn:hover{color:#fff}
+.hd-title{font-size:14px;font-weight:800;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.hd-badge{background:rgba(91,191,255,.2);color:#5bbfff;border:1px solid rgba(91,191,255,.35);border-radius:5px;padding:2px 9px;font-size:10px;font-weight:700;white-space:nowrap;flex-shrink:0}
+main{position:relative;z-index:10;max-width:820px;margin:0 auto;padding:28px 16px 80px}
+.doc-card{background:#fff;border-radius:16px;padding:36px 40px;box-shadow:0 8px 48px rgba(0,0,0,.28)}
+@media(max-width:600px){.doc-card{padding:22px 18px}}
+.doc-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:11px;color:#94a3b8;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #e2e8f0}
+/* Markdown typography */
+.doc-body{color:#1e293b;line-height:1.85;font-size:15px}
+.doc-body h1{font-size:22px;font-weight:800;color:#0d3a7a;margin:0 0 20px;padding-bottom:12px;border-bottom:2px solid #dbeafe}
+.doc-body h2{font-size:17px;font-weight:800;color:#1a4b7a;margin:32px 0 12px;padding:8px 12px;background:#f0f7ff;border-left:4px solid #1a72c8;border-radius:0 6px 6px 0}
+.doc-body h3{font-size:15px;font-weight:700;color:#1e40af;margin:22px 0 8px;padding-left:8px;border-left:2px solid #93c5fd}
+.doc-body h4{font-size:14px;font-weight:700;color:#374151;margin:16px 0 6px}
+.doc-body p{margin:0 0 14px;color:#334155}
+.doc-body ul,.doc-body ol{margin:0 0 14px 20px}
+.doc-body li{margin-bottom:6px;color:#334155}
+.doc-body li::marker{color:#1a72c8;font-weight:700}
+.doc-body table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px;overflow-x:auto;display:block}
+.doc-body th{background:#1a72c8;color:#fff;padding:10px 14px;text-align:left;font-weight:700;font-size:13px;white-space:nowrap}
+.doc-body td{padding:9px 14px;border-bottom:1px solid #e2e8f0;vertical-align:top;color:#334155}
+.doc-body tr:nth-child(even) td{background:#f8fafc}
+.doc-body tr:hover td{background:#eff6ff}
+.doc-body strong{color:#0d3a7a;font-weight:800}
+.doc-body em{color:#475569;font-style:italic}
+.doc-body code{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:2px 6px;font-size:13px;font-family:monospace;color:#334155}
+.doc-body pre{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;overflow-x:auto;margin:0 0 16px}
+.doc-body blockquote{border-left:4px solid #1a72c8;padding:10px 16px;background:#eff6ff;margin:0 0 14px;color:#475569;border-radius:0 8px 8px 0;font-style:italic}
+.doc-body hr{border:none;border-top:2px solid #e2e8f0;margin:28px 0}
+.doc-body a{color:#1a72c8;text-decoration:underline}
+.doc-body a:hover{color:#0d3a7a}
+.doc-body input[type=checkbox]{margin-right:6px;accent-color:#1a72c8;pointer-events:none}
+</style>
+</head>
+<body>
+<div class="bg-layer"></div>
+<header>
+  <a href="/" class="back-btn">← ポータル</a>
+  <span class="hd-title">接遇マニュアル【全職員向け】</span>
+  <span class="hd-badge">内部資料</span>
+</header>
+<main>
+  <div class="doc-card">
+    <div class="doc-meta" id="doc-meta"></div>
+    <div class="doc-body" id="doc-body"></div>
+  </div>
+</main>
+<script id="md-src" type="text/x-markdown"># 接遇マニュアル【全職員向け】
+
+医療法人 いなだ医院（2026年2月1日改訂）
+
+## 1. はじめに
+
+私たちの仕事は、介護を通してご利用者様の生きがいや温もりのある生活を支えることです。接遇は「性格」の問題ではなく、介護技術と同様に必須の業務能力（スキル）です。適切な接遇は信頼関係を生み、結果として職員自身の業務をスムーズにします。
+
+## 2. 接遇の定義と重要性
+
+- **接遇 ＝ 接客 ＋ おもてなし**
+  - 接客：最低限のマナーある対応（機械的）
+  - 接遇：利用者を思いやり、心理に寄り添った表情や態度でサービスを提供すること
+- **重要性：** 利用者の尊厳を守り、安心安全な介護へ繋がります。不適切な接遇はクレームや事故、さらには虐待に該当する恐れがあります。
+
+## 3. 接遇の5原則（遵守事項）
+
+1. **挨拶：** 自分から進んで行い、心と体を相手に向け、目線を合わせます。
+2. **身だしなみ：** 清潔感のある制服、短い爪（ネイル禁止）、業務中の装飾品（結婚指輪除く）や強い香りは不可。
+3. **表情・笑顔：** 穏やかで親しみやすい表情を基本とし、マスク越しでも目元で笑顔を伝えます。
+4. **態度・立ち居振る舞い：** 腕組みや壁への寄りかかりは禁止。利用者の体を物のように扱う動作は厳禁です。
+5. **言葉遣い：** 相手の年齢や認知機能に関わらず、敬語（です・ます調）を基本とします。
+
+## 4. 従業員同士の接遇と報告ルール
+
+良好なチームケアを提供するため、職員間でもプロとしての接遇を徹底します。
+
+- **職場内での礼儀：** 職員同士でも挨拶を徹底し、感謝や労いの言葉を積極的に伝えます。
+- **私事の禁止：** 利用者の前で、利用者を話題にした私語や、業務外の雑談・笑い声は慎んでください。
+- **相互扶助：** 困っている職員がいれば声をかけ、チーム全体で業務を支えます。
+
+### 接遇の指摘・指導に関する厳守事項
+
+- **報告のルート：** 他の職員の不適切な接遇を見かけた場合、または利用者から指摘を受けた場合は、速やかに職位上の上司へ報告してください。
+- **指導の実施：** 接遇に関する具体的な指摘や指導は、原則として職位上の上司（管理者等）から対象職員へ行います。
+- **注意点：** 勤続年数が長いことや、年齢が上であることを理由に、独断で他の職員を指導・叱責することは控えてください。指導は必ず組織図に基づいた指揮系統を通じて行います。
+- **緊急時：** 虐待の恐れなど緊急を要する場合はその場で制止し、事後直ちに上司へ報告してください。
+
+## 5. 場面別・言葉遣いのルール
+
+### 呼称の統一
+
+「〇〇さん」を基本とし、「おばあちゃん」「お母さん」「〇〇ちゃん」などの呼称は禁止です。
+
+### 言い換えの徹底
+
+| 禁止表現 | 推奨表現 |
+|----------|----------|
+| 「ご飯だよ、食べるよ」 | 「お食事のご用意ができました」 |
+| 「トイレ行くよ、ほら立って」 | 「お手洗いにご案内しましょうか」 |
+| 「ちょっと待ってて」 | 「少々お待ちいただけますか」 |
+| 「ダメ！」「座ってて！」 | 「危ないので、こちらにお掛けになってお待ちください」 |
+
+## 6. クレーム・苦情への初期対応
+
+1. **傾聴：** 最後まで話を聴き、途中で否定や反論をしない。
+2. **心情への謝罪：** 「不快な思いをさせてしまい申し訳ございません」と伝える。
+3. **即答回避と報告：** 独断で判断せず「確認して改めてご連絡します」と伝え、必ず管理者に報告します。
+
+## 7. 迷ったときの判断基準
+
+&gt; 「自分が利用者だったら、この対応をされて嫌ではないか？」  
+&gt; 「自分の大切な家族が、この態度で接されたらどう感じるか？」  
+&gt; 少しでも嫌だと感じるなら、その言動は不適切です。
+
+## 8. 接遇マナーチェックリスト
+
+- [ ] 自分から進んで明るく挨拶をしている
+- [ ] 利用者様と話すとき、目線の高さを合わせている
+- [ ] 忙しい時でも、ながら対応をせず穏やかに接している
+- [ ] 職員同士で感謝と労いの言葉を伝え合っている
+- [ ] 不適切な言動を見かけた際、独断で動かず上司に報告している
+
+---
+
+**相談窓口：** 接遇に関する疑問や、職場内での対応に悩む場合は、職位上の管理者または接遇担当まで連絡してください。</script>
+<script>
+const updated = '2026/5/6';
+const meta = document.getElementById('doc-meta');
+let m = '<span>📝 内部資料</span>';
+if (updated) m += '<span>更新: ' + updated + '</span>';
+meta.innerHTML = m;
+marked.use({breaks: true, gfm: true});
+const src = document.getElementById('md-src').textContent;
+document.getElementById('doc-body').innerHTML = marked.parse(src);
+document.querySelectorAll('.doc-body input[type=checkbox]').forEach(cb => { cb.disabled = true; });
+</script>
+</body>
+</html>
