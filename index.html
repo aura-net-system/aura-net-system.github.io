@@ -197,6 +197,11 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
 .link-icon-form{background:rgba(180,120,255,.15)}
 .lt-form{background:rgba(180,120,255,.2);color:#c084fc}
 .links-updated{font-size:11px;color:rgba(255,255,255,.3);text-align:right;margin-bottom:16px}
+/* 目次 TOC */
+.links-toc{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;padding:14px 16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:14px}
+.links-toc-label{font-size:10px;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:.1em;text-transform:uppercase;flex-basis:100%;margin-bottom:4px}
+.toc-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:20px;font-size:12px;font-weight:700;color:rgba(255,255,255,.8);cursor:pointer;transition:all .15s;text-decoration:none;white-space:nowrap}
+.toc-pill:hover{background:rgba(91,191,255,.22);border-color:rgba(91,191,255,.4);color:#fff}
 .back-btn{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.6);font-size:13px;font-weight:700;cursor:pointer;margin-bottom:16px;background:none;border:none}
 .back-btn:hover{color:#fff}
 
@@ -648,7 +653,13 @@ function renderLinks(){
   function renderGrid(items){
     return `<div class="links-grid">${items.map(renderItem).join('')}</div>`;
   }
-  const html=LINKS_DATA.map(cat=>{
+  // TOC
+  const tocPills=LINKS_DATA.map((cat,i)=>
+    `<a class="toc-pill" href="#lcat-${i}" onclick="event.preventDefault();var el=document.getElementById('lcat-${i}');if(el){el.open=true;setTimeout(function(){el.scrollIntoView({behavior:'smooth',block:'start'});},50);}">${esc(cat.icon)} ${esc(cat.category)}</a>`
+  ).join('');
+  const tocHtml=`<div class="links-toc"><span class="links-toc-label">▼ カテゴリ一覧</span>${tocPills}</div>`;
+
+  const html=LINKS_DATA.map((cat,i)=>{
     let body='';
     if(cat.items&&cat.items.length) body+=renderGrid(cat.items);
     if(cat.sub&&cat.sub.length){
@@ -658,12 +669,12 @@ function renderLinks(){
           <div class="links-subgrid">${renderGrid(s.items)}</div>
         </details>`).join('');
     }
-    return `<details class="links-category" open>
+    return `<details class="links-category" id="lcat-${i}" open>
       <summary class="links-cat-title">${esc(cat.icon)} ${esc(cat.category)}</summary>
       <div class="links-body">${body}</div>
     </details>`;
   }).join('');
-  el.innerHTML=updatedHtml+html;
+  el.innerHTML=updatedHtml+tocHtml+html;
 }
 let noticeFiles=[];
 
