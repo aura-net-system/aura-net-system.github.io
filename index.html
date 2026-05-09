@@ -8,6 +8,15 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#1a72c8">
+<script>
+(function(){
+  var KEY='aura_reload_date';
+  var today=new Date().toDateString();
+  var stored=localStorage.getItem(KEY);
+  localStorage.setItem(KEY,today);
+  if(stored&&stored!==today) location.reload(true);
+})();
+</script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -535,7 +544,7 @@ const storage=firebase.storage();
 
 // ========== 書類・リンク集 ==========
 // ※このデータはClaudeがGoogleドライブを読み取り自動更新します
-const LINKS_UPDATED='2026年5月7日';
+const LINKS_UPDATED='2026年5月9日';
 const LINKS_DATA=[
   {
     category:"接遇マニュアル",icon:"🤝",
