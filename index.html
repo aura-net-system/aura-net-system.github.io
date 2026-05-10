@@ -47,6 +47,10 @@ body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;min-height:100v
 .login-card input{width:100%;padding:12px 16px;background:rgba(255,255,255,.95);border:1px solid rgba(255,255,255,.6);border-radius:10px;font-size:15px;color:#1a202c;outline:none;transition:border .2s,background .2s,box-shadow .2s;margin-bottom:20px}
 .login-card input::placeholder{color:#a0aec0}
 .login-card input:focus{border-color:#5bbfff;background:#fff;box-shadow:0 0 0 3px rgba(91,191,255,.25)}
+.login-select{width:100%;padding:12px 16px;background:rgba(255,255,255,.95);border:1px solid rgba(255,255,255,.6);border-radius:10px;font-size:15px;color:#1a202c;outline:none;cursor:pointer;margin-bottom:20px;-webkit-appearance:auto;appearance:auto}
+.login-select:focus{border-color:#5bbfff;background:#fff;box-shadow:0 0 0 3px rgba(91,191,255,.25)}
+.login-hint{text-align:center;font-size:11px;color:rgba(255,255,255,.4);margin-top:16px}
+.facility-badge{background:rgba(91,191,255,.18);color:#93d5ff;border:1px solid rgba(91,191,255,.3);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.04em;display:none}
 .btn-login{width:100%;padding:13px;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(220,240,255,.95));color:#0d3a7a;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer;transition:opacity .2s,transform .1s;letter-spacing:.03em}
 .btn-login:hover{opacity:.9;transform:translateY(-1px)}
 .btn-login:disabled{opacity:.5;cursor:not-allowed;transform:none}
@@ -288,9 +292,20 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
       </div>
       <h1>AURA NET ポータル</h1>
       <p class="subtitle">STAFF PORTAL</p>
+      <label>施設を選択</label>
+      <select id="facility-select" class="login-select">
+        <option value="">--- 選択してください ---</option>
+        <option value="clinic">医院</option>
+        <option value="sakouju">介護施設（サ高住）</option>
+        <option value="kotaki">介護施設（小多機）</option>
+        <option value="day">介護施設（デイ）</option>
+        <option value="homecare">介護施設（訪問介護）</option>
+        <option value="kyotaku">居宅介護支援事業所</option>
+      </select>
       <label>アクセスコード</label>
       <input type="password" id="password" placeholder="アクセスコードを入力" autocomplete="current-password">
       <button class="btn-login" id="btn-login" onclick="doLogin()">ログイン</button>
+      <p class="login-hint">全権管理者の方は隠しコマンドよりログインしてください</p>
       <div id="login-error"></div>
     </div>
   </div>
@@ -308,6 +323,7 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
     </div>
     <div class="header-right">
       <span class="admin-badge" id="admin-badge" style="display:none">管理者</span>
+      <span id="facility-badge" class="facility-badge"></span>
       <button class="btn-logout" onclick="doLogout()">ログアウト</button>
     </div>
   </header>
@@ -601,6 +617,14 @@ const FB_AUTH_PASS='Ap3#Rz7-Mn4Kw';
 const FB_SYS_PASS='06419001';
 const ADMIN_PASS='06419008';
 
+const FACILITY_CONFIG=[
+  {id:'clinic',   label:'医院',               targets:['all','clinic']},
+  {id:'sakouju',  label:'介護施設（サ高住）',  targets:['all','care','sakouju']},
+  {id:'kotaki',   label:'介護施設（小多機）',  targets:['all','care','kotaki']},
+  {id:'day',      label:'介護施設（デイ）',    targets:['all','care','day']},
+  {id:'homecare', label:'介護施設（訪問介護）',targets:['all','care','homecare']},
+  {id:'kyotaku',  label:'居宅介護支援事業所',  targets:['all','clinic','care','sakouju','kotaki','day','homecare','kyotaku']},
+];
 firebase.initializeApp(FB_CONFIG);
 const auth=firebase.auth();
 const db=firebase.firestore();
@@ -730,7 +754,10 @@ function renderLinks(){
     other:{icon:'📎',cls:'link-icon-other',badge:'ファイル',badgeCls:'lt-other'}
   };
   function filterItems(items){
-    return (items||[]).filter(it=>isAdmin||it.audience!=='admin');
+    return (items||[]).filter(it=>{
+      if(!isAdmin&&it.audience==='admin') return false;
+      return canSeeTarget(it.target);
+    });
   }
   function renderItem(item){
     const t=TYPE_MAP[item.type]||TYPE_MAP.other;
@@ -883,7 +910,7 @@ let _groqKey='';
 function findRelevantDocs(q,k=4){
   if(!DOCS_INDEX.length) return [];
   const qL=q.toLowerCase();
-  return DOCS_INDEX.map(doc=>{
+  return DOCS_INDEX.filter(doc=>canSeeTarget(doc.target)).map(doc=>{
     const text=(doc.title+' '+doc.desc+' '+doc.content).toLowerCase();
     let score=0;
     for(let n=2;n<=8;n++){
@@ -1002,6 +1029,22 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 let isAdmin=false;
+let userFacility='';
+function canSeeTarget(target){
+  if(isAdmin) return true;
+  const t=target||'all';
+  if(t==='all') return true;
+  const f=FACILITY_CONFIG.find(x=>x.id===userFacility);
+  if(!f) return false;
+  return f.targets.includes(t);
+}
+function applyFacilityBadge(){
+  const badge=document.getElementById('facility-badge');
+  if(!badge) return;
+  if(isAdmin){badge.textContent='全権管理者';badge.style.display='inline-block';return;}
+  const f=FACILITY_CONFIG.find(x=>x.id===userFacility);
+  if(f){badge.textContent=f.label;badge.style.display='inline-block';}
+}
 let currentTab='home';
 let questionCount=0;
 let surveyFormData=null;
@@ -1020,7 +1063,9 @@ auth.onAuthStateChanged(user=>{
   if(user){
     // セッションから管理者権限を復元
     if(sessionStorage.getItem('aura_role')==='admin') isAdmin=true;
+    userFacility=sessionStorage.getItem('aura_facility')||'';
     show('portal-screen');
+    applyFacilityBadge();
     loadNotices();
     loadSurveys();
     loadThanks();
@@ -1106,25 +1151,29 @@ function checkAdminCode(){
 // ── ログイン ──
 async function doLogin(){
   const pw=document.getElementById('password').value;
+  const fac=document.getElementById('facility-select').value;
   const errEl=document.getElementById('login-error');
   const btn=document.getElementById('btn-login');
   errEl.style.display='none';
   if(!pw){showErr('アクセスコードを入力してください');return;}
   if(pw!==FB_SYS_PASS&&pw!==ADMIN_PASS){showErr('アクセスコードが正しくありません');return;}
   isAdmin=(pw===ADMIN_PASS);
+  if(!isAdmin&&!fac){showErr('施設を選択してください');return;}
+  userFacility=isAdmin?'admin':fac;
   btn.disabled=true;btn.textContent='ログイン中...';
   try{
     await auth.signInWithEmailAndPassword(FB_SYS_EMAIL,FB_AUTH_PASS);
     sessionStorage.setItem('aura_role',isAdmin?'admin':'staff');
+    sessionStorage.setItem('aura_facility',userFacility);
   }catch(e){
     showErr(e.code==='auth/too-many-requests'?'試行回数が多すぎます':'ログインに失敗しました（'+e.code+'）');
-    btn.disabled=false;btn.textContent='ログイン';isAdmin=false;
+    btn.disabled=false;btn.textContent='ログイン';isAdmin=false;userFacility='';
   }
   function showErr(m){errEl.textContent=m;errEl.style.display='block';}
 }
 document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing)doLogin();});
 
-function doLogout(){if(!confirm('ログアウトしますか？'))return;auth.signOut();sessionStorage.removeItem('aura_role');document.getElementById('password').value='';isAdmin=false;}
+function doLogout(){if(!confirm('ログアウトしますか？'))return;auth.signOut();sessionStorage.removeItem('aura_role');sessionStorage.removeItem('aura_facility');document.getElementById('password').value='';const fs=document.getElementById('facility-select');if(fs)fs.value='';isAdmin=false;userFacility='';}
 
 // ── タブ切替 ──
 function switchTab(tab){
