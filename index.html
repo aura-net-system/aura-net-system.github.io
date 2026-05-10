@@ -215,6 +215,27 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
 /* 管理者セクション区切り */
 .links-section-divider{display:flex;align-items:center;gap:12px;margin:30px 0 16px;font-size:11px;font-weight:800;color:rgba(255,200,80,.9);letter-spacing:.08em}
 .links-section-divider::before,.links-section-divider::after{content:'';flex:1;border-top:1px solid rgba(255,200,80,.2)}
+/* AI Q&A */
+.ai-intro{font-size:12px;color:rgba(255,255,255,.45);margin-bottom:14px;line-height:1.6}
+.ai-chat-wrap{min-height:200px;max-height:calc(100vh - 340px);overflow-y:auto;margin-bottom:12px;display:flex;flex-direction:column;gap:12px;padding-bottom:4px}
+.ai-bubble{border-radius:14px;padding:14px 18px;font-size:14px;line-height:1.8;max-width:100%}
+.ai-bubble-hint{background:rgba(255,255,255,.07);color:rgba(255,255,255,.4);font-size:12px;font-style:italic}
+.ai-bubble-user{background:rgba(91,191,255,.2);border:1px solid rgba(91,191,255,.3);color:#fff;align-self:flex-end;max-width:85%;border-bottom-right-radius:4px}
+.ai-bubble-answer{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;border-bottom-left-radius:4px}
+.ai-bubble-answer strong{color:#93d5ff}
+.ai-sources{margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.12)}
+.ai-sources-label{font-size:10px;font-weight:800;color:rgba(255,255,255,.35);letter-spacing:.08em;margin-bottom:6px}
+.ai-source-link{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(91,191,255,.1);border:1px solid rgba(91,191,255,.2);border-radius:8px;color:#93d5ff;font-size:12px;font-weight:700;text-decoration:none;margin-bottom:5px;transition:background .15s}
+.ai-source-link:hover{background:rgba(91,191,255,.22)}
+.ai-bubble-error{background:rgba(255,100,80,.15);border:1px solid rgba(255,100,80,.25);color:#fca5a5}
+.ai-bubble-loading{background:rgba(255,255,255,.07);color:rgba(255,255,255,.4);font-size:13px;animation:pulse .9s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.4}50%{opacity:.9}}
+.ai-input-row{display:flex;gap:8px;align-items:flex-end}
+.ai-input{flex:1;padding:12px 14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;color:#fff;font-size:14px;font-family:inherit;outline:none;resize:none;line-height:1.6;transition:border .18s}
+.ai-input::placeholder{color:rgba(255,255,255,.35)}
+.ai-input:focus{border-color:rgba(91,191,255,.5);background:rgba(255,255,255,.14)}
+.ai-send-btn{padding:10px 22px;background:linear-gradient(135deg,#1a72c8,#2f8ce0);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;transition:opacity .15s;white-space:nowrap;font-family:inherit;height:fit-content}
+.ai-send-btn:disabled{opacity:.4;cursor:not-allowed}
 /* 検索バー */
 .links-search-wrap{position:relative;margin-bottom:14px}
 .links-search-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none;color:rgba(255,255,255,.4)}
@@ -295,6 +316,7 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
     <button class="nav-btn active" onclick="switchTab('home')">ホーム</button>
     <button class="nav-btn" onclick="switchTab('notice')">📢 掲示板</button>
     <button class="nav-btn" onclick="switchTab('links')">📁 書類・リンク集</button>
+    <button class="nav-btn" onclick="switchTab('ai')">🤖 AIに聞く</button>
     <button class="nav-btn" onclick="switchTab('survey')">📊 アンケート</button>
     <button class="nav-btn" onclick="switchTab('thanks')">❤️ ありがとう</button>
     <button class="nav-btn admin-only" id="admin-nav" style="display:none" onclick="switchTab('admin')">⚙️ 管理</button>
@@ -460,6 +482,23 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
     </div>
   </div>
 
+  <!-- AIに聞く -->
+  <div class="screen" id="screen-ai">
+    <div style="margin-bottom:20px"></div>
+    <div class="section-label">🤖 AIに聞く</div>
+    <div class="ai-intro">社内書類をもとに質問に回答します。個人情報や機密情報は入力しないでください。</div>
+    <div class="ai-chat-wrap">
+      <div class="ai-messages" id="ai-messages">
+        <div class="ai-bubble ai-bubble-hint">例：「遅刻した場合の手続きは？」「制服を汚損した場合は？」「空調はいつつける？」</div>
+      </div>
+    </div>
+    <div class="ai-input-row">
+      <textarea class="ai-input" id="ai-input" placeholder="質問を入力してください..." rows="2"></textarea>
+      <button class="ai-send-btn" id="ai-send-btn" onclick="sendAiQuestion()">送信</button>
+    </div>
+    <div style="height:40px"></div>
+  </div>
+
   <!-- 管理 -->
   <div class="screen" id="screen-admin">
     <div style="margin-bottom:20px"></div>
@@ -524,6 +563,16 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
     <div class="glass-card">
       <div class="section-label">公開中のアンケート</div>
       <div id="admin-survey-list"></div>
+    </div>
+    <!-- GROQ APIキー設定 -->
+    <div class="admin-form">
+      <h3>🤖 AI設定（GROQ APIキー）</h3>
+      <div class="form-row">
+        <label>GROQ APIキー</label>
+        <input class="form-input" id="groq-key-input" type="password" placeholder="gsk_xxxx...">
+      </div>
+      <button class="btn-primary" onclick="saveGroqKey()">保存</button>
+      <span id="groq-key-status" style="margin-left:12px;font-size:12px;color:rgba(255,255,255,.5)"></span>
     </div>
     <div style="height:40px"></div>
   </div>
@@ -801,6 +850,121 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
 });
 
+// ── AI Q&A ──
+let _groqKey='';
+
+function findRelevantDocs(q,k=4){
+  if(!DOCS_INDEX.length) return [];
+  const qL=q.toLowerCase();
+  return DOCS_INDEX.map(doc=>{
+    const text=(doc.title+' '+doc.desc+' '+doc.content).toLowerCase();
+    let score=0;
+    for(let n=2;n<=8;n++){
+      for(let i=0;i<=qL.length-n;i++){
+        if(text.includes(qL.slice(i,i+n))) score+=n;
+      }
+    }
+    return{...doc,score};
+  }).filter(d=>d.score>0).sort((a,b)=>b.score-a.score).slice(0,k);
+}
+
+async function callGroq(question,docs){
+  if(!_groqKey) throw new Error('APIキーが設定されていません（管理者設定より登録してください）');
+  const ctx=docs.map((d,i)=>`【参照${i+1}】${d.title}\n${d.content}`).join('\n\n---\n\n');
+  const sys=`あなたは医療法人いなだ医院の社内AIアシスタントです。
+以下の社内書類を参考に、職員の質問に対して簡潔・丁寧な日本語で回答してください。
+書類に記載のない内容は「書類に記載がありません。管理者にご確認ください。」と正直に答えてください。
+回答は3〜6文程度にまとめてください。
+
+=== 参照書類 ===
+${ctx}`;
+  const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+_groqKey},
+    body:JSON.stringify({
+      model:'llama-3.3-70b-versatile',
+      messages:[{role:'system',content:sys},{role:'user',content:question}],
+      max_tokens:800,temperature:0.3
+    })
+  });
+  if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e.error?.message||`HTTP ${res.status}`);}
+  return(await res.json()).choices[0].message.content.trim();
+}
+
+async function sendAiQuestion(){
+  const input=document.getElementById('ai-input');
+  const btn=document.getElementById('ai-send-btn');
+  const msgs=document.getElementById('ai-messages');
+  const q=input.value.trim();
+  if(!q) return;
+  input.value='';btn.disabled=true;
+
+  // ユーザーバブル
+  const uBub=document.createElement('div');
+  uBub.className='ai-bubble ai-bubble-user';
+  uBub.textContent=q;
+  msgs.appendChild(uBub);
+
+  // ローディング
+  const lBub=document.createElement('div');
+  lBub.className='ai-bubble ai-bubble-loading';
+  lBub.textContent='回答を生成中...';
+  msgs.appendChild(lBub);
+  msgs.scrollTop=msgs.scrollHeight;
+
+  try{
+    const docs=findRelevantDocs(q);
+    const answer=await callGroq(q,docs);
+    lBub.remove();
+
+    const aBub=document.createElement('div');
+    aBub.className='ai-bubble ai-bubble-answer';
+
+    // 回答本文（**bold** → <strong>）
+    const ansHtml=answer.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    let html=ansHtml;
+
+    // 参照書類リンク
+    if(docs.length){
+      const links=docs.map(d=>`<a class="ai-source-link" href="${esc(d.url)}" target="_blank" rel="noopener">📄 ${esc(d.title)}</a>`).join('');
+      html+=`<div class="ai-sources"><div class="ai-sources-label">▼ 参照書類</div>${links}</div>`;
+    }
+    aBub.innerHTML=html;
+    msgs.appendChild(aBub);
+  }catch(err){
+    lBub.className='ai-bubble ai-bubble-error';
+    lBub.textContent='エラー: '+err.message;
+  }
+  msgs.scrollTop=msgs.scrollHeight;
+  btn.disabled=false;
+  input.focus();
+}
+
+async function saveGroqKey(){
+  const key=document.getElementById('groq-key-input').value.trim();
+  const st=document.getElementById('groq-key-status');
+  if(!key){st.textContent='キーを入力してください';return;}
+  try{
+    await db.collection('config').doc('ai').set({groq_key:key},{merge:true});
+    _groqKey=key;
+    st.textContent='✅ 保存しました';
+    document.getElementById('groq-key-input').value='';
+  }catch(e){st.textContent='❌ 保存失敗: '+e.message;}
+}
+
+async function loadGroqKey(){
+  try{
+    const doc=await db.collection('config').doc('ai').get();
+    if(doc.exists&&doc.data().groq_key) _groqKey=doc.data().groq_key;
+  }catch(e){}
+}
+
+// Enterキー送信（Shift+Enterで改行）
+document.addEventListener('DOMContentLoaded',()=>{
+  const inp=document.getElementById('ai-input');
+  if(inp) inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAiQuestion();}});
+});
+
 let isAdmin=false;
 let currentTab='home';
 let questionCount=0;
@@ -822,6 +986,7 @@ auth.onAuthStateChanged(user=>{
     loadNotices();
     loadSurveys();
     loadThanks();
+    loadGroqKey();
     if(isAdmin){
       document.getElementById('admin-badge').style.display='inline-block';
       document.getElementById('admin-nav').style.display='inline-block';
