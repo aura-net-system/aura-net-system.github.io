@@ -1018,8 +1018,7 @@ function applyAdminUI(){
         taps=0;
         const pw=prompt('🔐 管理者コード');
         if(pw!=null){
-          const el=document.getElementById('login-error');
-          if(pw===ADMIN_PASS){
+          if(pw==='0405'){
             isAdmin=true;
             sessionStorage.setItem('aura_role','admin');
             applyAdminUI();
