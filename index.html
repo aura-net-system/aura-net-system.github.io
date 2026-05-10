@@ -581,6 +581,37 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
   <!-- 管理 -->
   <div class="screen" id="screen-admin">
     <div style="margin-bottom:20px"></div>
+    <!-- 権限・アクセスコード管理 -->
+    <div class="admin-form" style="border:1px solid rgba(255,200,80,.3)">
+      <h3>🔐 アクセスコード管理</h3>
+      <p style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:16px">コードを変更すると次回ログインから反映されます。変更後は関係者に新しいコードを通知してください。</p>
+      <div style="display:grid;gap:10px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-row">
+            <label>スタッフ共通コード</label>
+            <div style="display:flex;gap:6px">
+              <input class="form-input" id="ac-staff" type="password" placeholder="現在のコード">
+              <button onclick="togglePw('ac-staff')" style="padding:6px 10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:rgba(255,255,255,.7);font-size:11px;cursor:pointer;white-space:nowrap">表示</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>全権管理者コード</label>
+            <div style="display:flex;gap:6px">
+              <input class="form-input" id="ac-admin" type="password" placeholder="現在のコード">
+              <button onclick="togglePw('ac-admin')" style="padding:6px 10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:rgba(255,255,255,.7);font-size:11px;cursor:pointer;white-space:nowrap">表示</button>
+            </div>
+          </div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:.06em;margin-top:4px">事業所管理者コード</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="facility-code-grid">
+          <!-- JSで生成 -->
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
+        <button class="btn-primary" onclick="saveAccessCodes()">💾 保存</button>
+        <span id="ac-status" style="font-size:12px;color:rgba(255,255,255,.5)"></span>
+      </div>
+    </div>
     <!-- GROQ APIキー設定 -->
     <div class="admin-form" style="border:1px solid rgba(91,191,255,.3)">
       <h3>🤖 AI設定（GROQ APIキー）</h3>
@@ -1154,6 +1185,78 @@ async function sendAiQuestion(){
   input.focus();
 }
 
+// ── アクセスコード管理 ──
+function togglePw(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.type=el.type==='password'?'text':'password';
+}
+
+function buildFacilityCodeGrid(){
+  const grid=document.getElementById('facility-code-grid');
+  if(!grid) return;
+  grid.innerHTML=FACILITY_CONFIG.map(f=>`
+    <div class="form-row">
+      <label>${f.label}</label>
+      <div style="display:flex;gap:6px">
+        <input class="form-input" id="ac-${f.id}" type="password" placeholder="${f.adminCode}" value="">
+        <button onclick="togglePw('ac-${f.id}')" style="padding:6px 10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:6px;color:rgba(255,255,255,.7);font-size:11px;cursor:pointer;white-space:nowrap">表示</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function loadAccessCodes(){
+  try{
+    const doc=await db.collection('config').doc('access_codes').get();
+    if(!doc.exists) return;
+    const data=doc.data();
+    if(data.staff) window._dynStaffPass=data.staff;
+    if(data.admin) window._dynAdminPass=data.admin;
+    if(data.facility){
+      FACILITY_CONFIG.forEach(f=>{
+        if(data.facility[f.id]) f.adminCode=data.facility[f.id];
+      });
+    }
+    // フォームに現在値を反映
+    if(data.staff){const el=document.getElementById('ac-staff');if(el)el.placeholder=data.staff;}
+    if(data.admin){const el=document.getElementById('ac-admin');if(el)el.placeholder=data.admin;}
+    FACILITY_CONFIG.forEach(f=>{
+      const el=document.getElementById('ac-'+f.id);
+      if(el) el.placeholder=f.adminCode;
+    });
+  }catch(e){}
+}
+
+async function saveAccessCodes(){
+  const status=document.getElementById('ac-status');
+  status.textContent='保存中...';status.style.color='rgba(255,255,255,.5)';
+  const staff=document.getElementById('ac-staff').value.trim();
+  const admin=document.getElementById('ac-admin').value.trim();
+  const facility={};
+  FACILITY_CONFIG.forEach(f=>{
+    const el=document.getElementById('ac-'+f.id);
+    if(el&&el.value.trim()) facility[f.id]=el.value.trim();
+  });
+  try{
+    const data={updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+    if(staff) data.staff=staff;
+    if(admin) data.admin=admin;
+    if(Object.keys(facility).length) data.facility=facility;
+    await db.collection('config').doc('access_codes').set(data,{merge:true});
+    // 入力クリアしてプレースホルダー更新
+    if(staff){window._dynStaffPass=staff;document.getElementById('ac-staff').value='';document.getElementById('ac-staff').placeholder=staff;}
+    if(admin){window._dynAdminPass=admin;document.getElementById('ac-admin').value='';document.getElementById('ac-admin').placeholder=admin;}
+    FACILITY_CONFIG.forEach(f=>{
+      const el=document.getElementById('ac-'+f.id);
+      if(el&&el.value.trim()){f.adminCode=el.value.trim();el.placeholder=f.adminCode;el.value='';}
+    });
+    status.style.color='#4ade80';status.textContent='✅ 保存しました（次回ログインから反映）';
+  }catch(e){
+    status.style.color='#f87171';status.textContent='エラー: '+e.message;
+  }
+}
+
 async function saveGroqKey(){
   const key=document.getElementById('groq-key-input').value.trim();
   const st=document.getElementById('groq-key-status');
@@ -1252,6 +1355,8 @@ function applyAdminUI(){
   if(nfRow) nfRow.style.display='block';
   loadAdminNotices();
   loadAdminSurveys();
+  buildFacilityCodeGrid();
+  loadAccessCodes();
 }
 
 // ── 隠しコマンド：ロゴ5連打で管理者モード ──
@@ -1326,19 +1431,40 @@ async function doLogin(){
   const btn=document.getElementById('btn-login');
   errEl.style.display='none';
   if(!pw){showErr('アクセスコードを入力してください');return;}
-  isAdmin=(pw===ADMIN_PASS);
-  const facCfg=FACILITY_CONFIG.find(f=>f.id===fac);
-  isFacilityAdmin=!isAdmin&&!!facCfg&&pw===facCfg.adminCode;
-  const isStaff=!isAdmin&&!isFacilityAdmin&&pw===FB_SYS_PASS;
-  if(!isAdmin&&!isFacilityAdmin&&!isStaff){showErr('アクセスコードが正しくありません');return;}
-  if(!isAdmin&&!fac){showErr('施設を選択してください');return;}
-  userFacility=isAdmin?'admin':fac;
-  btn.disabled=true;btn.textContent='ログイン中...';
+  btn.disabled=true;btn.textContent='確認中...';
   try{
+    // Firebase認証（共通アカウント）でFirestoreアクセス権取得
     await auth.signInWithEmailAndPassword(FB_SYS_EMAIL,FB_AUTH_PASS);
+    // Firestoreからコード設定を読み込んでFACILITY_CONFIGを上書き
+    try{
+      const codesDoc=await db.collection('config').doc('access_codes').get();
+      if(codesDoc.exists){
+        const codes=codesDoc.data();
+        if(codes.staff) window._dynStaffPass=codes.staff;
+        if(codes.admin) window._dynAdminPass=codes.admin;
+        if(codes.facility) FACILITY_CONFIG.forEach(f=>{if(codes.facility[f.id]) f.adminCode=codes.facility[f.id];});
+      }
+    }catch(e){}
+    // コード検証（Firestore上書き後のFACILITY_CONFIGで確認）
+    const currentAdminPass=window._dynAdminPass||ADMIN_PASS;
+    const currentStaffPass=window._dynStaffPass||FB_SYS_PASS;
+    isAdmin=(pw===currentAdminPass);
+    const facCfg=FACILITY_CONFIG.find(f=>f.id===fac);
+    isFacilityAdmin=!isAdmin&&!!facCfg&&pw===facCfg.adminCode;
+    const isStaff=!isAdmin&&!isFacilityAdmin&&pw===currentStaffPass;
+    if(!isAdmin&&!isFacilityAdmin&&!isStaff){
+      await auth.signOut();showErr('アクセスコードが正しくありません');
+      btn.disabled=false;btn.textContent='ログイン';return;
+    }
+    if(!isAdmin&&!fac){
+      await auth.signOut();showErr('施設を選択してください');
+      btn.disabled=false;btn.textContent='ログイン';return;
+    }
+    userFacility=isAdmin?'admin':fac;
     const role=isAdmin?'admin':isFacilityAdmin?'facility_admin':'staff';
     sessionStorage.setItem('aura_role',role);
     sessionStorage.setItem('aura_facility',userFacility);
+    btn.textContent='ログイン';
   }catch(e){
     showErr(e.code==='auth/too-many-requests'?'試行回数が多すぎます':'ログインに失敗しました（'+e.code+'）');
     btn.disabled=false;btn.textContent='ログイン';isAdmin=false;isFacilityAdmin=false;userFacility='';
