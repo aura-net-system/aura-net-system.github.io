@@ -605,6 +605,10 @@ firebase.initializeApp(FB_CONFIG);
 const auth=firebase.auth();
 const db=firebase.firestore();
 const storage=firebase.storage();
+// タブを閉じたらログアウト（SESSION永続化）
+auth.setPersistence(firebase.auth.Auth.Persistence.SESSION).catch(()=>{});
+// セッション外からのアクセスは強制ログアウト（直リンク・別タブ対策）
+if(!sessionStorage.getItem('aura_role')){auth.signOut().catch(()=>{});}
 
 // ========== 書類・リンク集 ==========
 // ※このデータはClaudeがGoogleドライブを読み取り自動更新します
@@ -982,15 +986,18 @@ async function loadGroqKey(){
   }catch(e){}
 }
 
-// Enterキー送信（Shift+Enterで改行・IME変換中は送信しない）
+// Enterキー送信（Shift+Enterで改行・IME変換確定後の2回目Enterで送信）
 document.addEventListener('DOMContentLoaded',()=>{
   const inp=document.getElementById('ai-input');
   if(!inp) return;
-  let composing=false;
-  inp.addEventListener('compositionstart',()=>{composing=true;});
-  inp.addEventListener('compositionend',()=>{composing=false;});
+  let composing=false,justEnded=false;
+  inp.addEventListener('compositionstart',()=>{composing=true;justEnded=false;});
+  inp.addEventListener('compositionend',()=>{composing=false;justEnded=true;});
   inp.addEventListener('keydown',e=>{
-    if(e.key==='Enter'&&!e.shiftKey&&!composing){e.preventDefault();sendAiQuestion();}
+    if(e.key==='Enter'&&!e.shiftKey){
+      if(composing||justEnded){justEnded=false;return;}
+      e.preventDefault();sendAiQuestion();
+    }
   });
 });
 
