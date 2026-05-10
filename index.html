@@ -267,6 +267,32 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
 
 @media(min-width:860px){.login-brand-area{display:block}}
 @media(max-width:600px){.screen{padding:16px 14px}.hd-texts .h-sub{display:none}.portal-nav{padding:0 12px}.nav-btn{padding:11px 13px;font-size:12px}}
+
+/* 事業所資料プレビュー */
+.doc-body{color:#1e293b;line-height:1.9;font-size:15px}
+.doc-body h1{font-size:22px;font-weight:900;color:#061428;margin:0 0 20px;padding-bottom:12px;border-bottom:3px solid #1a72c8}
+.doc-body h2{font-size:16px;font-weight:800;color:#fff;margin:28px 0 12px;padding:9px 14px;background:linear-gradient(90deg,#1a72c8,#2f8ce0);border-radius:8px}
+.doc-body h3{font-size:14px;font-weight:800;color:#0d3a7a;margin:20px 0 8px;padding:5px 10px 5px 12px;background:#f0f7ff;border-left:4px solid #1a72c8;border-radius:0 6px 6px 0}
+.doc-body p{margin:0 0 12px;color:#374151}
+.doc-body ul,.doc-body ol{margin:0 0 12px 20px}
+.doc-body li{margin-bottom:6px;color:#374151}
+.doc-body li::marker{color:#1a72c8;font-weight:700}
+.doc-body table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;border-radius:8px;overflow:hidden}
+.doc-body th{background:linear-gradient(90deg,#1a72c8,#2f8ce0);color:#fff;padding:9px 14px;text-align:left;font-weight:800;font-size:12px}
+.doc-body td{padding:8px 14px;border-bottom:1px solid #e8eef8;color:#374151}
+.doc-body tr:last-child td{border-bottom:none}
+.doc-body tr:nth-child(even) td{background:#f7faff}
+.doc-body blockquote{border-radius:8px;padding:12px 16px 12px 44px;margin:0 0 12px;background:#f0f7ff;color:#1e4080;position:relative;font-size:14px}
+.doc-body blockquote::before{content:'ℹ';position:absolute;left:12px;top:12px;color:#1a72c8;font-size:16px;font-weight:900}
+.doc-body code{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:2px 6px;font-size:12px;font-family:'Menlo','Consolas',monospace;color:#1e40af}
+.doc-body pre{background:#1e2d40;border-radius:8px;padding:16px;overflow-x:auto;margin:0 0 12px}
+.doc-body pre code{background:none;border:none;padding:0;color:#93d5ff;font-size:12px}
+.doc-body strong{color:#0d3a7a;font-weight:800}
+.doc-body hr{border:none;border-top:2px solid #f1f5f9;margin:24px 0}
+.facility-doc-item{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.facility-doc-item-body{flex:1;min-width:0}
+.facility-doc-item-title{font-size:14px;font-weight:700;color:rgba(255,255,255,.92);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.facility-doc-item-desc{font-size:12px;color:rgba(255,255,255,.5)}
 </style>
 </head>
 <body>
@@ -333,6 +359,7 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
     <button class="nav-btn" onclick="switchTab('notice')">📢 掲示板</button>
     <button class="nav-btn" onclick="switchTab('links')">📁 書類・リンク集</button>
     <button class="nav-btn" onclick="switchTab('ai')">🤖 AIに聞く</button>
+    <button class="nav-btn" onclick="switchTab('docmgr')" style="display:none">📁 資料管理</button>
     <button class="nav-btn" onclick="switchTab('survey')">📊 アンケート</button>
     <button class="nav-btn" onclick="switchTab('thanks')">❤️ ありがとう</button>
     <button class="nav-btn admin-only" id="admin-nav" style="display:none" onclick="switchTab('admin')">⚙️ 管理</button>
@@ -515,6 +542,42 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
     <div style="height:40px"></div>
   </div>
 
+  <!-- 資料管理 -->
+  <div class="screen" id="screen-docmgr">
+  <div class="section-label">資料管理</div>
+  <!-- 新規作成フォーム -->
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-size:13px;font-weight:800;color:rgba(255,255,255,.9);margin-bottom:14px">📝 新規資料作成</div>
+    <div class="form-row">
+      <label>タイトル</label>
+      <input type="text" id="doc-title" placeholder="資料のタイトルを入力" style="width:100%;padding:10px 12px;background:rgba(255,255,255,.95);border:1px solid rgba(200,220,255,.8);border-radius:8px;color:#1a202c;font-size:14px;outline:none">
+    </div>
+    <div class="form-row">
+      <label>説明（一覧表示・検索用）</label>
+      <input type="text" id="doc-desc" placeholder="資料の内容を一言で" style="width:100%;padding:10px 12px;background:rgba(255,255,255,.95);border:1px solid rgba(200,220,255,.8);border-radius:8px;color:#1a202c;font-size:14px;outline:none">
+    </div>
+    <div class="form-row">
+      <label>本文（Markdown記法対応・直接入力またはTXTから貼り付け）</label>
+      <textarea id="doc-content" placeholder="# タイトル&#10;&#10;内容をここに入力してください。&#10;&#10;## 見出し&#10;- 箇条書き" style="width:100%;height:220px;padding:12px;background:rgba(255,255,255,.95);border:1px solid rgba(200,220,255,.8);border-radius:8px;color:#1a202c;font-size:13px;font-family:'Menlo','Consolas',monospace;outline:none;resize:vertical;line-height:1.6" oninput="previewDoc()"></textarea>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button onclick="previewDoc()" style="padding:8px 18px;background:rgba(91,191,255,.2);color:#93d5ff;border:1px solid rgba(91,191,255,.3);border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">👁 プレビュー</button>
+      <button onclick="saveDoc()" style="padding:8px 18px;background:linear-gradient(135deg,#1a72c8,#2f8ce0);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">💾 保存・公開</button>
+    </div>
+    <div id="doc-save-msg" style="display:none;margin-top:10px;font-size:12px;color:#5bbfff"></div>
+  </div>
+  <!-- プレビュー -->
+  <div id="doc-preview-wrap" style="display:none;margin-bottom:16px">
+    <div style="font-size:12px;font-weight:800;color:rgba(255,255,255,.4);letter-spacing:.08em;margin-bottom:10px">プレビュー</div>
+    <div class="card" style="background:#fff;border-radius:14px;padding:28px 32px">
+      <div class="doc-body" id="doc-preview-body"></div>
+    </div>
+  </div>
+  <!-- 投稿済み資料一覧 -->
+  <div class="section-label" style="margin-top:8px">投稿済み資料</div>
+  <div id="facility-doc-list"></div>
+</div>
+
   <!-- 管理 -->
   <div class="screen" id="screen-admin">
     <div style="margin-bottom:20px"></div>
@@ -553,6 +616,18 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
         <label class="file-drop" id="n-file-drop" for="n-files">📎 クリックまたはドラッグでファイルを追加</label>
         <input type="file" id="n-files" accept=".pdf,.png,.jpg,.jpeg" multiple style="display:none" onchange="handleNoticeFiles(this.files)">
         <div class="file-preview-list" id="n-file-preview"></div>
+      </div>
+      <div class="form-row" id="notice-facility-row" style="display:none">
+        <label>対象施設</label>
+        <select class="form-select" id="notice-facility">
+          <option value="all">全施設</option>
+          <option value="clinic">医院</option>
+          <option value="sakouju">介護施設（サ高住）</option>
+          <option value="kotaki">介護施設（小多機）</option>
+          <option value="day">介護施設（デイ）</option>
+          <option value="homecare">介護施設（訪問介護）</option>
+          <option value="kyotaku">居宅介護支援事業所</option>
+        </select>
       </div>
       <button class="btn-primary" id="btn-post-notice" onclick="postNotice()">投稿する</button>
     </div>
@@ -618,12 +693,12 @@ const FB_SYS_PASS='06419001';
 const ADMIN_PASS='06419008';
 
 const FACILITY_CONFIG=[
-  {id:'clinic',   label:'医院',               targets:['all','clinic']},
-  {id:'sakouju',  label:'介護施設（サ高住）',  targets:['all','care','sakouju']},
-  {id:'kotaki',   label:'介護施設（小多機）',  targets:['all','care','kotaki']},
-  {id:'day',      label:'介護施設（デイ）',    targets:['all','care','day']},
-  {id:'homecare', label:'介護施設（訪問介護）',targets:['all','care','homecare']},
-  {id:'kyotaku',  label:'居宅介護支援事業所',  targets:['all','clinic','care','sakouju','kotaki','day','homecare','kyotaku']},
+  {id:'clinic',   label:'医院',               adminCode:'0601', targets:['all','clinic']},
+  {id:'sakouju',  label:'介護施設（サ高住）',  adminCode:'0602', targets:['all','care','sakouju']},
+  {id:'kotaki',   label:'介護施設（小多機）',  adminCode:'0603', targets:['all','care','kotaki']},
+  {id:'day',      label:'介護施設（デイ）',    adminCode:'0604', targets:['all','care','day']},
+  {id:'homecare', label:'介護施設（訪問介護）',adminCode:'0605', targets:['all','care','homecare']},
+  {id:'kyotaku',  label:'居宅介護支援事業所',  adminCode:'0606', targets:['all','clinic','care','sakouju','kotaki','day','homecare','kyotaku']},
 ];
 firebase.initializeApp(FB_CONFIG);
 const auth=firebase.auth();
@@ -904,6 +979,91 @@ document.addEventListener('DOMContentLoaded',()=>{
   }
 });
 
+// ── 事業所資料管理（Firestore）──
+function previewDoc(){
+  const content=document.getElementById('doc-content').value;
+  const wrap=document.getElementById('doc-preview-wrap');
+  const body=document.getElementById('doc-preview-body');
+  if(!content.trim()){wrap.style.display='none';return;}
+  wrap.style.display='block';
+  if(typeof marked!=='undefined') body.innerHTML=marked.parse(content);
+  else body.textContent=content;
+}
+
+async function saveDoc(){
+  const title=document.getElementById('doc-title').value.trim();
+  const desc=document.getElementById('doc-desc').value.trim();
+  const content=document.getElementById('doc-content').value.trim();
+  const msg=document.getElementById('doc-save-msg');
+  if(!title){msg.style.display='block';msg.style.color='#f87171';msg.textContent='タイトルを入力してください';return;}
+  if(!content){msg.style.display='block';msg.style.color='#f87171';msg.textContent='本文を入力してください';return;}
+  msg.style.display='block';msg.style.color='#93d5ff';msg.textContent='保存中...';
+  try{
+    await db.collection('facility_docs').add({
+      title,desc,content,
+      target:userFacility,
+      facility:userFacility,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+      updatedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      published:true
+    });
+    msg.style.color='#4ade80';msg.textContent='✅ 保存・公開しました';
+    document.getElementById('doc-title').value='';
+    document.getElementById('doc-desc').value='';
+    document.getElementById('doc-content').value='';
+    document.getElementById('doc-preview-wrap').style.display='none';
+    loadFacilityDocs();
+  }catch(e){
+    msg.style.color='#f87171';msg.textContent='エラー: '+e.message;
+  }
+}
+
+async function loadFacilityDocs(){
+  const listEl=document.getElementById('facility-doc-list');
+  if(!listEl) return;
+  listEl.innerHTML='<div style="color:rgba(255,255,255,.4);font-size:13px;padding:8px">読み込み中...</div>';
+  try{
+    let q=db.collection('facility_docs').where('published','==',true).orderBy('createdAt','desc');
+    if(!isAdmin) q=q.where('facility','==',userFacility);
+    const snap=await q.get();
+    if(snap.empty){listEl.innerHTML='<div style="color:rgba(255,255,255,.4);font-size:13px;padding:8px">投稿済み資料はありません</div>';return;}
+    listEl.innerHTML=snap.docs.map(doc=>{
+      const d=doc.data();
+      const dt=d.createdAt?new Date(d.createdAt.seconds*1000).toLocaleDateString('ja-JP'):'';
+      const facLabel=(FACILITY_CONFIG.find(f=>f.id===d.facility)||{label:d.facility}).label;
+      return `<div class="facility-doc-item">
+        <div style="font-size:28px">📝</div>
+        <div class="facility-doc-item-body">
+          <div class="facility-doc-item-title">${esc(d.title)}</div>
+          <div class="facility-doc-item-desc">${esc(d.desc||'')}　<span style="opacity:.6">${facLabel}　${dt}</span></div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button onclick="viewFacilityDoc('${doc.id}')" style="padding:5px 12px;background:rgba(91,191,255,.18);color:#93d5ff;border:1px solid rgba(91,191,255,.3);border-radius:6px;font-size:12px;cursor:pointer">閲覧</button>
+          <button onclick="deleteFacilityDoc('${doc.id}')" style="padding:5px 10px;background:rgba(255,100,80,.15);color:#fca5a5;border:1px solid rgba(255,100,80,.3);border-radius:6px;font-size:12px;cursor:pointer">削除</button>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    listEl.innerHTML='<div style="color:#f87171;font-size:13px;padding:8px">読み込みエラー: '+e.message+'</div>';
+  }
+}
+
+async function deleteFacilityDoc(id){
+  if(!confirm('この資料を削除しますか？')) return;
+  await db.collection('facility_docs').doc(id).delete();
+  loadFacilityDocs();
+}
+
+function viewFacilityDoc(id){
+  db.collection('facility_docs').doc(id).get().then(doc=>{
+    if(!doc.exists) return;
+    const d=doc.data();
+    const w=window.open('','_blank');
+    const html=`<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>${d.title} | AURA NET</title><script src="https://cdn.jsdelivr.net/npm/marked@9/marked.min.js"><\/script><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Hiragino Kaku Gothic ProN','Meiryo',sans-serif;background:linear-gradient(145deg,#4fa8f5,#1a72c8,#0d3a7a,#061428);min-height:100vh;padding:24px 16px}.card{background:#fff;border-radius:18px;padding:40px 44px;max-width:860px;margin:0 auto;box-shadow:0 12px 60px rgba(0,0,0,.3)}</style></head><body><div class="card"><div class="doc-body" id="b"></div></div><link rel="stylesheet" href="https://aura-net-system.github.io/"><script>marked.use({breaks:true,gfm:true});document.getElementById('b').innerHTML=marked.parse(${JSON.stringify(d.content)});<\/script></body></html>`;
+    w.document.write(html);w.document.close();
+  });
+}
+
 // ── AI Q&A ──
 let _groqKey='';
 
@@ -1029,6 +1189,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 let isAdmin=false;
+let isFacilityAdmin=false;
 let userFacility='';
 function canSeeTarget(target){
   if(isAdmin) return true;
@@ -1044,6 +1205,11 @@ function applyFacilityBadge(){
   if(isAdmin){badge.textContent='全権管理者';badge.style.display='inline-block';return;}
   const f=FACILITY_CONFIG.find(x=>x.id===userFacility);
   if(f){badge.textContent=f.label;badge.style.display='inline-block';}
+}
+function applyFacilityAdminUI(){
+  const btn=document.querySelector('.nav-btn[onclick="switchTab(\'docmgr\')"]');
+  if(btn) btn.style.display='inline-flex';
+  loadFacilityDocs();
 }
 let currentTab='home';
 let questionCount=0;
@@ -1063,6 +1229,7 @@ auth.onAuthStateChanged(user=>{
   if(user){
     // セッションから管理者権限を復元
     if(sessionStorage.getItem('aura_role')==='admin') isAdmin=true;
+    if(sessionStorage.getItem('aura_role')==='facility_admin') isFacilityAdmin=true;
     userFacility=sessionStorage.getItem('aura_facility')||'';
     show('portal-screen');
     applyFacilityBadge();
@@ -1071,6 +1238,7 @@ auth.onAuthStateChanged(user=>{
     loadThanks();
     loadGroqKey();
     if(isAdmin) applyAdminUI();
+    if(isFacilityAdmin) applyFacilityAdminUI();
   } else {
     isAdmin=false;
     show('login-screen');
@@ -1080,6 +1248,8 @@ auth.onAuthStateChanged(user=>{
 function applyAdminUI(){
   document.getElementById('admin-badge').style.display='inline-block';
   document.getElementById('admin-nav').style.display='inline-block';
+  const nfRow=document.getElementById('notice-facility-row');
+  if(nfRow) nfRow.style.display='block';
   loadAdminNotices();
   loadAdminSurveys();
 }
@@ -1156,24 +1326,28 @@ async function doLogin(){
   const btn=document.getElementById('btn-login');
   errEl.style.display='none';
   if(!pw){showErr('アクセスコードを入力してください');return;}
-  if(pw!==FB_SYS_PASS&&pw!==ADMIN_PASS){showErr('アクセスコードが正しくありません');return;}
   isAdmin=(pw===ADMIN_PASS);
+  const facCfg=FACILITY_CONFIG.find(f=>f.id===fac);
+  isFacilityAdmin=!isAdmin&&!!facCfg&&pw===facCfg.adminCode;
+  const isStaff=!isAdmin&&!isFacilityAdmin&&pw===FB_SYS_PASS;
+  if(!isAdmin&&!isFacilityAdmin&&!isStaff){showErr('アクセスコードが正しくありません');return;}
   if(!isAdmin&&!fac){showErr('施設を選択してください');return;}
   userFacility=isAdmin?'admin':fac;
   btn.disabled=true;btn.textContent='ログイン中...';
   try{
     await auth.signInWithEmailAndPassword(FB_SYS_EMAIL,FB_AUTH_PASS);
-    sessionStorage.setItem('aura_role',isAdmin?'admin':'staff');
+    const role=isAdmin?'admin':isFacilityAdmin?'facility_admin':'staff';
+    sessionStorage.setItem('aura_role',role);
     sessionStorage.setItem('aura_facility',userFacility);
   }catch(e){
     showErr(e.code==='auth/too-many-requests'?'試行回数が多すぎます':'ログインに失敗しました（'+e.code+'）');
-    btn.disabled=false;btn.textContent='ログイン';isAdmin=false;userFacility='';
+    btn.disabled=false;btn.textContent='ログイン';isAdmin=false;isFacilityAdmin=false;userFacility='';
   }
   function showErr(m){errEl.textContent=m;errEl.style.display='block';}
 }
 document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing)doLogin();});
 
-function doLogout(){if(!confirm('ログアウトしますか？'))return;auth.signOut();sessionStorage.removeItem('aura_role');sessionStorage.removeItem('aura_facility');document.getElementById('password').value='';const fs=document.getElementById('facility-select');if(fs)fs.value='';isAdmin=false;userFacility='';}
+function doLogout(){if(!confirm('ログアウトしますか？'))return;auth.signOut();sessionStorage.removeItem('aura_role');sessionStorage.removeItem('aura_facility');document.getElementById('password').value='';const fs=document.getElementById('facility-select');if(fs)fs.value='';isAdmin=false;isFacilityAdmin=false;userFacility='';}
 
 // ── タブ切替 ──
 function switchTab(tab){
@@ -1228,10 +1402,16 @@ function toggleNotice(id){
 
 function loadNotices(){
   db.collection('notices').orderBy('createdAt','desc').limit(20).onSnapshot(snap=>{
-    const items=snap.docs.map(d=>noticeItemHTML(d)).join('');
+    const filtered=snap.docs.filter(doc=>{
+      const d=doc.data();
+      // 施設フィルター（管理者は全件、それ以外は自施設+全体のみ）
+      if(!isAdmin && d.facility && d.facility !== 'all' && d.facility !== userFacility) return false;
+      return true;
+    });
+    const items=filtered.map(d=>noticeItemHTML(d)).join('');
     document.getElementById('notice-list').innerHTML=items||'<div class="empty-msg">お知らせはありません</div>';
     // ホームに最新3件
-    const latest=snap.docs.slice(0,3).map(d=>noticeItemHTML(d)).join('');
+    const latest=filtered.slice(0,3).map(d=>noticeItemHTML(d)).join('');
     document.getElementById('home-notice-list').innerHTML=latest||'<div class="empty-msg" style="padding:16px">お知らせはありません</div>';
   });
 }
@@ -1251,7 +1431,7 @@ async function postNotice(){
       const url=await ref.getDownloadURL();
       attachments.push({name:file.name,url,type:file.type});
     }
-    await db.collection('notices').add({title,body,category:cat,attachments,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
+    await db.collection('notices').add({title,body,category:cat,attachments,facility: isAdmin ? (document.getElementById('notice-facility')?.value||'all') : userFacility,createdAt:firebase.firestore.FieldValue.serverTimestamp()});
     document.getElementById('n-title').value='';
     document.getElementById('n-body').value='';
     noticeFiles=[];
