@@ -329,7 +329,7 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
         <option value="kyotaku">居宅介護支援事業所</option>
       </select>
       <label>スタッフID</label>
-      <input type="text" id="staff-id" placeholder="例：S001" autocomplete="username" style="width:100%;padding:12px 16px;background:rgba(255,255,255,.95);border:1px solid rgba(255,255,255,.6);border-radius:10px;font-size:15px;color:#1a202c;outline:none;transition:border .2s;margin-bottom:20px">
+      <input type="text" id="staff-id" placeholder="例：1001" inputmode="numeric" maxlength="4" autocomplete="username" style="width:100%;padding:12px 16px;background:rgba(255,255,255,.95);border:1px solid rgba(255,255,255,.6);border-radius:10px;font-size:15px;color:#1a202c;outline:none;transition:border .2s;margin-bottom:20px">
       <label>個人PIN</label>
       <input type="password" id="password" placeholder="4〜6桁のPIN" autocomplete="current-password">
       <button class="btn-login" id="btn-login" onclick="doLogin()">ログイン</button>
@@ -615,8 +615,17 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
             </select>
           </div>
           <div class="form-row">
-            <label>スタッフID（自動発行）</label>
-            <input class="form-input" id="ns-id-preview" disabled placeholder="保存時に発行" style="opacity:.6">
+            <label>スタッフID（4桁・空欄で自動）</label>
+            <input class="form-input" id="ns-id-input" inputmode="numeric" maxlength="4" placeholder="例: 1001">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <div class="form-row">
+            <label>初期PIN（4桁）</label>
+            <input class="form-input" id="ns-pin" inputmode="numeric" maxlength="4" placeholder="例: 1234">
+          </div>
+          <div style="display:flex;align-items:flex-end;padding-bottom:2px">
+            <span style="font-size:11px;color:rgba(255,255,255,.4);line-height:1.5">空欄の場合はIDと同じPINが設定されます</span>
           </div>
         </div>
         <div style="margin-bottom:12px">
@@ -637,7 +646,7 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:12px">
-          <button class="btn-primary" onclick="addStaff()" style="font-size:13px;padding:8px 18px">＋ 追加（初期PIN: 0000）</button>
+          <button class="btn-primary" onclick="addStaff()" style="font-size:13px;padding:8px 18px">＋ スタッフを追加</button>
           <span id="ns-status" style="font-size:12px;color:rgba(255,255,255,.5)"></span>
         </div>
       </div>
@@ -1342,10 +1351,10 @@ let _currentStaffDocId='';
 
 async function generateStaffId(){
   const snap=await db.collection('staff_accounts').orderBy('staffId','desc').limit(1).get();
-  if(snap.empty) return 'S001';
-  const last=snap.docs[0].data().staffId||'S000';
-  const num=parseInt(last.replace('S',''))||0;
-  return 'S'+String(num+1).padStart(3,'0');
+  if(snap.empty) return '1001';
+  const last=snap.docs[0].data().staffId||'1000';
+  const num=parseInt(last)||1000;
+  return String(num+1).padStart(4,'0');
 }
 
 async function addStaff(){
@@ -1353,19 +1362,24 @@ async function addStaff(){
   const facility=document.getElementById('ns-facility').value;
   const role=document.getElementById('ns-role').value;
   const karteRole=document.getElementById('ns-karte-role')?.value||'';
+  const customId=(document.getElementById('ns-id-input')?.value||'').trim();
+  const customPin=(document.getElementById('ns-pin')?.value||'').trim();
   const status=document.getElementById('ns-status');
   if(!name){status.style.color='#f87171';status.textContent='氏名を入力してください';return;}
+  if(customId&&!/^\d{4}$/.test(customId)){status.style.color='#f87171';status.textContent='IDは4桁の数字で入力してください';return;}
+  if(customPin&&!/^\d{4}$/.test(customPin)){status.style.color='#f87171';status.textContent='PINは4桁の数字で入力してください';return;}
   status.style.color='rgba(255,255,255,.5)';status.textContent='追加中...';
   try{
-    const staffId=await generateStaffId();
-    document.getElementById('ns-id-preview').placeholder=staffId;
-    const doc={staffId,name,facility,role,pin:'0000',active:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
-    if(karteRole) doc.karteRole=karteRole;
-    await db.collection('staff_accounts').add(doc);
-    status.style.color='#4ade80';status.textContent=`✅ ${name}（${staffId}）を追加しました`;
+    const staffId=customId||(await generateStaffId());
+    const pin=customPin||staffId;
+    const docData={staffId,name,facility,role,pin,active:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+    if(karteRole) docData.karteRole=karteRole;
+    await db.collection('staff_accounts').add(docData);
+    status.style.color='#4ade80';status.textContent=`✅ ${name}（ID: ${staffId} / PIN: ${pin}）を追加しました`;
     document.getElementById('ns-name').value='';
+    document.getElementById('ns-id-input').value='';
+    document.getElementById('ns-pin').value='';
     document.getElementById('ns-karte-role').value='';
-    document.getElementById('ns-id-preview').placeholder='保存時に発行';
     loadStaffList();
   }catch(e){status.style.color='#f87171';status.textContent='エラー: '+e.message;}
 }
@@ -1384,11 +1398,12 @@ async function loadStaffList(){
     if(snap.empty){el.innerHTML='<div style="color:rgba(255,255,255,.4);font-size:13px;padding:8px">スタッフが登録されていません</div>';return;}
     const ROLE_LABEL={staff:'スタッフ',facility_admin:'事業所管理者'};
     const FAC_LABEL={clinic:'医院',sakouju:'サ高住',kotaki:'小多機',day:'デイ',homecare:'訪問介護',kyotaku:'居宅'};
-    el.innerHTML=`<div style="display:grid;grid-template-columns:60px 1fr 80px 80px 70px auto;gap:0;border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden">
+    el.innerHTML=`<div style="display:grid;grid-template-columns:55px 1fr 70px 80px 55px 55px auto;gap:0;border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden">
       <div style="padding:8px 10px;background:rgba(255,255,255,.08);font-size:11px;font-weight:700;color:rgba(255,255,255,.5)">ID</div>
       <div style="padding:8px 10px;background:rgba(255,255,255,.08);font-size:11px;font-weight:700;color:rgba(255,255,255,.5)">氏名</div>
       <div style="padding:8px 10px;background:rgba(255,255,255,.08);font-size:11px;font-weight:700;color:rgba(255,255,255,.5)">施設</div>
       <div style="padding:8px 10px;background:rgba(255,255,255,.08);font-size:11px;font-weight:700;color:rgba(255,255,255,.5)">権限</div>
+      <div style="padding:8px 10px;background:rgba(255,255,255,.08);font-size:11px;font-weight:700;color:rgba(255,255,255,.5)">PIN</div>
       <div style="padding:8px 10px;background:rgba(255,255,255,.08);font-size:11px;font-weight:700;color:rgba(255,255,255,.5)">状態</div>
       <div style="padding:8px 10px;background:rgba(255,255,255,.08);font-size:11px;font-weight:700;color:rgba(255,255,255,.5)">操作</div>
       ${snap.docs.map((doc,i)=>{
@@ -1396,14 +1411,15 @@ async function loadStaffList(){
         const bg=i%2===0?'rgba(255,255,255,.03)':'rgba(255,255,255,.06)';
         const activeColor=d.active?'#4ade80':'#f87171';
         const activeLabel=d.active?'有効':'無効';
-        return `<div style="padding:9px 10px;background:${bg};color:rgba(255,255,255,.9);font-weight:700">${esc(d.staffId||'')}</div>
+        return `<div style="padding:9px 10px;background:${bg};color:rgba(255,255,255,.9);font-weight:700;font-family:monospace">${esc(d.staffId||'')}</div>
           <div style="padding:9px 10px;background:${bg};color:rgba(255,255,255,.85)">${esc(d.name||'')}</div>
           <div style="padding:9px 10px;background:${bg};color:rgba(255,255,255,.6);font-size:12px">${FAC_LABEL[d.facility]||d.facility||''}</div>
           <div style="padding:9px 10px;background:${bg};color:rgba(255,255,255,.6);font-size:12px">${ROLE_LABEL[d.role]||d.role||''}</div>
+          <div style="padding:9px 10px;background:${bg};color:#fbbf24;font-size:13px;font-weight:700;font-family:monospace">${esc(d.pin||'----')}</div>
           <div style="padding:9px 10px;background:${bg};color:${activeColor};font-size:12px;font-weight:700">${activeLabel}</div>
           <div style="padding:6px 8px;background:${bg};display:flex;gap:4px;flex-wrap:wrap">
             <button onclick="toggleStaffActive('${doc.id}',${d.active})" style="padding:3px 8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:5px;color:rgba(255,255,255,.7);font-size:11px;cursor:pointer;white-space:nowrap">${d.active?'無効化':'有効化'}</button>
-            <button onclick="resetStaffPin('${doc.id}','${esc(d.name||'')}')" style="padding:3px 8px;background:rgba(91,191,255,.15);border:1px solid rgba(91,191,255,.3);border-radius:5px;color:#93d5ff;font-size:11px;cursor:pointer;white-space:nowrap">PIN初期化</button>
+            <button onclick="changeStaffPin('${doc.id}','${esc(d.name||'')}','${esc(d.pin||'')}')" style="padding:3px 8px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);border-radius:5px;color:#fbbf24;font-size:11px;cursor:pointer;white-space:nowrap">PIN変更</button>
           </div>`;
       }).join('')}
     </div>`;
@@ -1415,10 +1431,13 @@ async function toggleStaffActive(docId,current){
   loadStaffList();
 }
 
-async function resetStaffPin(docId,name){
-  if(!confirm(`${name} のPINを「0000」にリセットしますか？`)) return;
-  await db.collection('staff_accounts').doc(docId).update({pin:'0000'});
-  showToast(`${name} のPINをリセットしました`);
+async function changeStaffPin(docId,name,currentPin){
+  const newPin=prompt(`${name} の新しいPINを入力してください（4桁の数字）\n現在のPIN: ${currentPin}`);
+  if(newPin===null) return;
+  if(!/^\d{4}$/.test(newPin)){alert('PINは4桁の数字で入力してください');return;}
+  await db.collection('staff_accounts').doc(docId).update({pin:newPin});
+  showToast(`${name} のPINを変更しました`);
+  loadStaffList();
 }
 
 // ── PIN変更モーダル ──
@@ -1610,7 +1629,7 @@ function checkAdminCode(){
 
 // ── ログイン ──
 async function doLogin(){
-  const staffId=(document.getElementById('staff-id')?.value||'').trim().toUpperCase();
+  const staffId=(document.getElementById('staff-id')?.value||'').trim();
   const pin=document.getElementById('password').value;
   const fac=document.getElementById('facility-select').value;
   const errEl=document.getElementById('login-error');
