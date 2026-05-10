@@ -959,10 +959,16 @@ async function loadGroqKey(){
   }catch(e){}
 }
 
-// Enterキー送信（Shift+Enterで改行）
+// Enterキー送信（Shift+Enterで改行・IME変換中は送信しない）
 document.addEventListener('DOMContentLoaded',()=>{
   const inp=document.getElementById('ai-input');
-  if(inp) inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAiQuestion();}});
+  if(!inp) return;
+  let composing=false;
+  inp.addEventListener('compositionstart',()=>{composing=true;});
+  inp.addEventListener('compositionend',()=>{composing=false;});
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'&&!e.shiftKey&&!composing){e.preventDefault();sendAiQuestion();}
+  });
 });
 
 let isAdmin=false;
