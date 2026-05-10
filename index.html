@@ -328,10 +328,12 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
         <option value="homecare">介護施設（訪問介護）</option>
         <option value="kyotaku">居宅介護支援事業所</option>
       </select>
-      <label>アクセスコード</label>
-      <input type="password" id="password" placeholder="アクセスコードを入力" autocomplete="current-password">
+      <label>スタッフID</label>
+      <input type="text" id="staff-id" placeholder="例：S001" autocomplete="username" style="width:100%;padding:12px 16px;background:rgba(255,255,255,.95);border:1px solid rgba(255,255,255,.6);border-radius:10px;font-size:15px;color:#1a202c;outline:none;transition:border .2s;margin-bottom:20px">
+      <label>個人PIN</label>
+      <input type="password" id="password" placeholder="4〜6桁のPIN" autocomplete="current-password">
       <button class="btn-login" id="btn-login" onclick="doLogin()">ログイン</button>
-      <p class="login-hint">全権管理者の方は隠しコマンドよりログインしてください</p>
+      <p class="login-hint">初回ログインのPINは <strong style="color:rgba(255,255,255,.65)">0000</strong>　｜　全権管理者は隠しコマンドへ</p>
       <div id="login-error"></div>
     </div>
   </div>
@@ -581,6 +583,67 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
   <!-- 管理 -->
   <div class="screen" id="screen-admin">
     <div style="margin-bottom:20px"></div>
+    <!-- スタッフ管理 -->
+    <div class="admin-form" style="border:1px solid rgba(91,191,255,.3)">
+      <h3>👥 スタッフ管理</h3>
+      <!-- 追加フォーム -->
+      <div style="background:rgba(255,255,255,.06);border-radius:10px;padding:14px;margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:12px;letter-spacing:.05em">スタッフを追加</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+          <div class="form-row">
+            <label>氏名</label>
+            <input class="form-input" id="ns-name" placeholder="氏名">
+          </div>
+          <div class="form-row">
+            <label>施設</label>
+            <select class="form-select" id="ns-facility">
+              <option value="clinic">医院</option>
+              <option value="sakouju">介護施設（サ高住）</option>
+              <option value="kotaki">介護施設（小多機）</option>
+              <option value="day">介護施設（デイ）</option>
+              <option value="homecare">介護施設（訪問介護）</option>
+              <option value="kyotaku">居宅介護支援事業所</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+          <div class="form-row">
+            <label>権限</label>
+            <select class="form-select" id="ns-role">
+              <option value="staff">スタッフ</option>
+              <option value="facility_admin">事業所管理者</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>スタッフID（自動発行）</label>
+            <input class="form-input" id="ns-id-preview" disabled placeholder="保存時に発行" style="opacity:.6">
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="btn-primary" onclick="addStaff()" style="font-size:13px;padding:8px 18px">＋ 追加（初期PIN: 0000）</button>
+          <span id="ns-status" style="font-size:12px;color:rgba(255,255,255,.5)"></span>
+        </div>
+      </div>
+      <!-- 検索・フィルター -->
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <select class="form-select" id="sl-facility-filter" onchange="loadStaffList()" style="max-width:180px">
+          <option value="">全施設</option>
+          <option value="clinic">医院</option>
+          <option value="sakouju">サ高住</option>
+          <option value="kotaki">小多機</option>
+          <option value="day">デイ</option>
+          <option value="homecare">訪問介護</option>
+          <option value="kyotaku">居宅</option>
+        </select>
+        <select class="form-select" id="sl-status-filter" onchange="loadStaffList()" style="max-width:120px">
+          <option value="active">有効のみ</option>
+          <option value="all">全員</option>
+        </select>
+        <button onclick="loadStaffList()" style="padding:8px 14px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:rgba(255,255,255,.8);font-size:12px;cursor:pointer">更新</button>
+      </div>
+      <!-- 一覧テーブル -->
+      <div id="staff-list" style="font-size:13px"></div>
+    </div>
     <!-- 権限・アクセスコード管理 -->
     <div class="admin-form" style="border:1px solid rgba(255,200,80,.3)">
       <h3>🔐 アクセスコード管理</h3>
@@ -1257,6 +1320,109 @@ async function saveAccessCodes(){
   }
 }
 
+// ── スタッフ管理 ──
+let _currentStaffDocId='';
+
+async function generateStaffId(){
+  const snap=await db.collection('staff_accounts').orderBy('staffId','desc').limit(1).get();
+  if(snap.empty) return 'S001';
+  const last=snap.docs[0].data().staffId||'S000';
+  const num=parseInt(last.replace('S',''))||0;
+  return 'S'+String(num+1).padStart(3,'0');
+}
+
+async function addStaff(){
+  const name=document.getElementById('ns-name').value.trim();
+  const facility=document.getElementById('ns-facility').value;
+  const role=document.getElementById('ns-role').value;
+  const status=document.getElementById('ns-status');
+  if(!name){status.style.color='#f87171';status.textContent='氏名を入力してください';return;}
+  status.style.color='rgba(255,255,255,.5)';status.textContent='追加中...';
+  try{
+    const staffId=await generateStaffId();
+    document.getElementById('ns-id-preview').placeholder=staffId;
+    await db.collection('staff_accounts').add({
+      staffId,name,facility,role,pin:'0000',active:true,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    status.style.color='#4ade80';status.textContent=`✅ ${name}（${staffId}）を追加しました`;
+    document.getElementById('ns-name').value='';
+    document.getElementById('ns-id-preview').placeholder='保存時に発行';
+    loadStaffList();
+  }catch(e){status.style.color='#f87171';status.textContent='エラー: '+e.message;}
+}
+
+async function loadStaffList(){
+  const el=document.getElementById('staff-list');
+  if(!el) return;
+  el.innerHTML='<div style="color:rgba(255,255,255,.4);font-size:13px;padding:8px">読み込み中...</div>';
+  try{
+    let q=db.collection('staff_accounts').orderBy('staffId');
+    const facFilter=document.getElementById('sl-facility-filter')?.value;
+    const statusFilter=document.getElementById('sl-status-filter')?.value;
+    if(facFilter) q=q.where('facility','==',facFilter);
+    if(statusFilter==='active') q=q.where('active','==',true);
+    const snap=await q.get();
+    if(snap.empty){el.innerHTML='<div style="color:rgba(255,255,255,.4);font-size:13px;padding:8px">スタッフが登録されていません</div>';return;}
+    const ROLE_LABEL={staff:'スタッフ',facility_admin:'事業所管理者'};
+    const FAC_LABEL={clinic:'医院',sakouju:'サ高住',kotaki:'小多機',day:'デイ',homecare:'訪問介護',kyotaku:'居宅'};
+    el.innerHTML=`<div style="display:grid;grid-template-columns:60px 1fr 80px 80px 70px auto;gap:0;border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden">
+      <div style="padding:8px 10px;background:rgba(255,255,255,.08);font-size:11px;font-weight:700;color:rgba(255,255,255,.5)">ID</div>
+      <div style="padding:8px 10px;background:rgba(255,255,255,.08);font-size:11px;font-weight:700;color:rgba(255,255,255,.5)">氏名</div>
+      <div style="padding:8px 10px;background:rgba(255,255,255,.08);font-size:11px;font-weight:700;color:rgba(255,255,255,.5)">施設</div>
+      <div style="padding:8px 10px;background:rgba(255,255,255,.08);font-size:11px;font-weight:700;color:rgba(255,255,255,.5)">権限</div>
+      <div style="padding:8px 10px;background:rgba(255,255,255,.08);font-size:11px;font-weight:700;color:rgba(255,255,255,.5)">状態</div>
+      <div style="padding:8px 10px;background:rgba(255,255,255,.08);font-size:11px;font-weight:700;color:rgba(255,255,255,.5)">操作</div>
+      ${snap.docs.map((doc,i)=>{
+        const d=doc.data();
+        const bg=i%2===0?'rgba(255,255,255,.03)':'rgba(255,255,255,.06)';
+        const activeColor=d.active?'#4ade80':'#f87171';
+        const activeLabel=d.active?'有効':'無効';
+        return `<div style="padding:9px 10px;background:${bg};color:rgba(255,255,255,.9);font-weight:700">${esc(d.staffId||'')}</div>
+          <div style="padding:9px 10px;background:${bg};color:rgba(255,255,255,.85)">${esc(d.name||'')}</div>
+          <div style="padding:9px 10px;background:${bg};color:rgba(255,255,255,.6);font-size:12px">${FAC_LABEL[d.facility]||d.facility||''}</div>
+          <div style="padding:9px 10px;background:${bg};color:rgba(255,255,255,.6);font-size:12px">${ROLE_LABEL[d.role]||d.role||''}</div>
+          <div style="padding:9px 10px;background:${bg};color:${activeColor};font-size:12px;font-weight:700">${activeLabel}</div>
+          <div style="padding:6px 8px;background:${bg};display:flex;gap:4px;flex-wrap:wrap">
+            <button onclick="toggleStaffActive('${doc.id}',${d.active})" style="padding:3px 8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:5px;color:rgba(255,255,255,.7);font-size:11px;cursor:pointer;white-space:nowrap">${d.active?'無効化':'有効化'}</button>
+            <button onclick="resetStaffPin('${doc.id}','${esc(d.name||'')}')" style="padding:3px 8px;background:rgba(91,191,255,.15);border:1px solid rgba(91,191,255,.3);border-radius:5px;color:#93d5ff;font-size:11px;cursor:pointer;white-space:nowrap">PIN初期化</button>
+          </div>`;
+      }).join('')}
+    </div>`;
+  }catch(e){el.innerHTML='<div style="color:#f87171;font-size:13px;padding:8px">エラー: '+e.message+'</div>';}
+}
+
+async function toggleStaffActive(docId,current){
+  await db.collection('staff_accounts').doc(docId).update({active:!current});
+  loadStaffList();
+}
+
+async function resetStaffPin(docId,name){
+  if(!confirm(`${name} のPINを「0000」にリセットしますか？`)) return;
+  await db.collection('staff_accounts').doc(docId).update({pin:'0000'});
+  showToast(`${name} のPINをリセットしました`);
+}
+
+// ── PIN変更モーダル ──
+function showPinChangeModal(){
+  const ov=document.getElementById('pin-change-overlay');
+  ov.style.display='flex';
+}
+
+async function submitNewPin(){
+  const p1=document.getElementById('new-pin').value;
+  const p2=document.getElementById('new-pin-confirm').value;
+  const err=document.getElementById('pin-change-err');
+  err.style.display='none';
+  if(p1.length<4){err.style.display='block';err.textContent='PINは4桁以上で入力してください';return;}
+  if(p1!==p2){err.style.display='block';err.textContent='PINが一致しません';return;}
+  try{
+    await db.collection('staff_accounts').doc(_currentStaffDocId).update({pin:p1});
+    document.getElementById('pin-change-overlay').style.display='none';
+    showToast('PINを設定しました');
+  }catch(e){err.style.display='block';err.textContent='エラー: '+e.message;}
+}
+
 async function saveGroqKey(){
   const key=document.getElementById('groq-key-input').value.trim();
   const st=document.getElementById('groq-key-status');
@@ -1357,6 +1523,7 @@ function applyAdminUI(){
   loadAdminSurveys();
   buildFacilityCodeGrid();
   loadAccessCodes();
+  loadStaffList();
 }
 
 // ── 隠しコマンド：ロゴ5連打で管理者モード ──
@@ -1425,55 +1592,60 @@ function checkAdminCode(){
 
 // ── ログイン ──
 async function doLogin(){
-  const pw=document.getElementById('password').value;
+  const staffId=(document.getElementById('staff-id')?.value||'').trim().toUpperCase();
+  const pin=document.getElementById('password').value;
   const fac=document.getElementById('facility-select').value;
   const errEl=document.getElementById('login-error');
   const btn=document.getElementById('btn-login');
   errEl.style.display='none';
-  if(!pw){showErr('アクセスコードを入力してください');return;}
+  if(!pin){showErr('PINを入力してください');return;}
   btn.disabled=true;btn.textContent='確認中...';
   try{
-    // Firebase認証（共通アカウント）でFirestoreアクセス権取得
     await auth.signInWithEmailAndPassword(FB_SYS_EMAIL,FB_AUTH_PASS);
-    // Firestoreからコード設定を読み込んでFACILITY_CONFIGを上書き
-    try{
-      const codesDoc=await db.collection('config').doc('access_codes').get();
-      if(codesDoc.exists){
-        const codes=codesDoc.data();
-        if(codes.staff) window._dynStaffPass=codes.staff;
-        if(codes.admin) window._dynAdminPass=codes.admin;
-        if(codes.facility) FACILITY_CONFIG.forEach(f=>{if(codes.facility[f.id]) f.adminCode=codes.facility[f.id];});
-      }
-    }catch(e){}
-    // コード検証（Firestore上書き後のFACILITY_CONFIGで確認）
+    // 全権管理者チェック（staffID空＋adminパス）
     const currentAdminPass=window._dynAdminPass||ADMIN_PASS;
-    const currentStaffPass=window._dynStaffPass||FB_SYS_PASS;
-    isAdmin=(pw===currentAdminPass);
-    const facCfg=FACILITY_CONFIG.find(f=>f.id===fac);
-    isFacilityAdmin=!isAdmin&&!!facCfg&&pw===facCfg.adminCode;
-    const isStaff=!isAdmin&&!isFacilityAdmin&&pw===currentStaffPass;
-    if(!isAdmin&&!isFacilityAdmin&&!isStaff){
-      await auth.signOut();showErr('アクセスコードが正しくありません');
+    if(!staffId&&pin===currentAdminPass){
+      isAdmin=true;isFacilityAdmin=false;userFacility='admin';
+      sessionStorage.setItem('aura_role','admin');
+      sessionStorage.setItem('aura_facility','admin');
       btn.disabled=false;btn.textContent='ログイン';return;
     }
-    if(!isAdmin&&!fac){
-      await auth.signOut();showErr('施設を選択してください');
-      btn.disabled=false;btn.textContent='ログイン';return;
-    }
-    userFacility=isAdmin?'admin':fac;
-    const role=isAdmin?'admin':isFacilityAdmin?'facility_admin':'staff';
+    // スタッフIDチェック
+    if(!staffId){showErr('スタッフIDを入力してください');await auth.signOut();btn.disabled=false;btn.textContent='ログイン';return;}
+    if(!fac){showErr('施設を選択してください');await auth.signOut();btn.disabled=false;btn.textContent='ログイン';return;}
+    // Firestoreでスタッフ照合
+    const snap=await db.collection('staff_accounts')
+      .where('staffId','==',staffId)
+      .where('active','==',true)
+      .limit(1).get();
+    if(snap.empty){showErr('スタッフIDが見つかりません、または無効なアカウントです');await auth.signOut();btn.disabled=false;btn.textContent='ログイン';return;}
+    const staffDoc=snap.docs[0];
+    const staffData=staffDoc.data();
+    if(staffData.pin!==pin){showErr('PINが正しくありません');await auth.signOut();btn.disabled=false;btn.textContent='ログイン';return;}
+    if(staffData.facility&&staffData.facility!==fac){showErr('選択した施設と登録施設が一致しません');await auth.signOut();btn.disabled=false;btn.textContent='ログイン';return;}
+    // 認証成功
+    isAdmin=false;
+    isFacilityAdmin=(staffData.role==='facility_admin');
+    userFacility=fac;
+    _currentStaffDocId=staffDoc.id;
+    const role=isFacilityAdmin?'facility_admin':'staff';
     sessionStorage.setItem('aura_role',role);
-    sessionStorage.setItem('aura_facility',userFacility);
-    btn.textContent='ログイン';
+    sessionStorage.setItem('aura_facility',fac);
+    btn.disabled=false;btn.textContent='ログイン';
+    // 初回PIN変更チェック
+    if(pin==='0000') setTimeout(showPinChangeModal,600);
   }catch(e){
-    showErr(e.code==='auth/too-many-requests'?'試行回数が多すぎます':'ログインに失敗しました（'+e.code+'）');
+    if(e.code&&e.code.startsWith('auth/')){
+      showErr(e.code==='auth/too-many-requests'?'試行回数が多すぎます':'Firebase認証エラー（'+e.code+'）');
+    } else {showErr(e.message||'ログインエラーが発生しました');}
     btn.disabled=false;btn.textContent='ログイン';isAdmin=false;isFacilityAdmin=false;userFacility='';
   }
   function showErr(m){errEl.textContent=m;errEl.style.display='block';}
 }
 document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing)doLogin();});
+document.getElementById('staff-id')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing)document.getElementById('password')?.focus();});
 
-function doLogout(){if(!confirm('ログアウトしますか？'))return;auth.signOut();sessionStorage.removeItem('aura_role');sessionStorage.removeItem('aura_facility');document.getElementById('password').value='';const fs=document.getElementById('facility-select');if(fs)fs.value='';isAdmin=false;isFacilityAdmin=false;userFacility='';}
+function doLogout(){if(!confirm('ログアウトしますか？'))return;auth.signOut();sessionStorage.removeItem('aura_role');sessionStorage.removeItem('aura_facility');document.getElementById('password').value='';const fs=document.getElementById('facility-select');if(fs)fs.value='';const si=document.getElementById('staff-id');if(si)si.value='';isAdmin=false;isFacilityAdmin=false;userFacility='';_currentStaffDocId='';}
 
 // ── タブ切替 ──
 function switchTab(tab){
@@ -1862,6 +2034,20 @@ async function deleteThanks(id){
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 let toastTimer;
 function toast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2500);}
+function showToast(msg){toast(msg);}
 </script>
+<!-- PIN変更モーダル -->
+<div id="pin-change-overlay" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(6,20,40,.85);backdrop-filter:blur(8px);align-items:center;justify-content:center">
+  <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:36px 32px;width:100%;max-width:360px;backdrop-filter:blur(24px)">
+    <h3 style="color:#fff;font-size:17px;font-weight:800;margin-bottom:6px">🔑 PINを設定してください</h3>
+    <p style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:22px">初回ログインのため、新しいPINを設定してください。</p>
+    <label style="display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.6);margin-bottom:6px;letter-spacing:.06em">新しいPIN（4〜6桁）</label>
+    <input type="password" id="new-pin" placeholder="新しいPIN" maxlength="6" style="width:100%;padding:12px 16px;background:rgba(255,255,255,.95);border:1px solid rgba(255,255,255,.6);border-radius:10px;font-size:20px;color:#1a202c;outline:none;margin-bottom:14px;letter-spacing:.2em;text-align:center">
+    <label style="display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.6);margin-bottom:6px;letter-spacing:.06em">確認（もう一度）</label>
+    <input type="password" id="new-pin-confirm" placeholder="確認入力" maxlength="6" style="width:100%;padding:12px 16px;background:rgba(255,255,255,.95);border:1px solid rgba(255,255,255,.6);border-radius:10px;font-size:20px;color:#1a202c;outline:none;margin-bottom:18px;letter-spacing:.2em;text-align:center">
+    <div id="pin-change-err" style="display:none;color:#fca5a5;font-size:12px;margin-bottom:12px;text-align:center"></div>
+    <button onclick="submitNewPin()" style="width:100%;padding:13px;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(220,240,255,.95));color:#0d3a7a;border:none;border-radius:10px;font-size:15px;font-weight:800;cursor:pointer">設定して開始</button>
+  </div>
+</div>
 </body>
 </html>
