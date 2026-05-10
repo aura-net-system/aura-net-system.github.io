@@ -619,6 +619,23 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
             <input class="form-input" id="ns-id-preview" disabled placeholder="保存時に発行" style="opacity:.6">
           </div>
         </div>
+        <div style="margin-bottom:12px">
+          <div class="form-row">
+            <label>カルテ権限（介護施設のみ）</label>
+            <select class="form-select" id="ns-karte-role">
+              <option value="">自動（施設・権限から判定）</option>
+              <option value="nurse">看護師</option>
+              <option value="care">介護職員</option>
+              <option value="home_care">居宅職員</option>
+              <option value="doctor">医師</option>
+              <option value="facility_manager_resident">サ高住管理者</option>
+              <option value="facility_manager_stay">小多機管理者</option>
+              <option value="facility_manager_commute">デイ管理者</option>
+              <option value="facility_manager_visit">訪問管理者</option>
+              <option value="facility_manager_home_care">居宅管理者</option>
+            </select>
+          </div>
+        </div>
         <div style="display:flex;align-items:center;gap:12px">
           <button class="btn-primary" onclick="addStaff()" style="font-size:13px;padding:8px 18px">＋ 追加（初期PIN: 0000）</button>
           <span id="ns-status" style="font-size:12px;color:rgba(255,255,255,.5)"></span>
@@ -810,22 +827,22 @@ const LINKS_DATA=[
   {
     category:"接遇マニュアル",icon:"🤝",
     items:[
-      {title:"接遇マニュアル【全職員向け】",url:"https://aura-net-system.github.io/docs/01_接遇/接遇マニュアル_全職員向け.html",type:"doc",desc:"接遇5原則・言葉遣いのルール・クレーム初期対応の基本（全員必読）",updated:"2026/5/6"},
-      {title:"接遇マニュアル【新入職員向け】",url:"https://aura-net-system.github.io/docs/01_接遇/接遇マニュアル_新入職員向け.html",type:"doc",desc:"入職初日から使える接遇の基本・具体的な言い回し例・指揮系統のルール",updated:"2026/5/6"},
-      {title:"接遇マニュアル【管理者用】",url:"https://aura-net-system.github.io/docs/01_接遇/接遇マニュアル_管理者用.html",type:"doc",desc:"接遇振り返り制度の運用・月次評価基準（4段階）・面談・フィードバックルール",updated:"2026/5/6"}
+      {title:"接遇マニュアル【全職員向け】",url:"https://aura-net-system.github.io/docs/01_接遇/接遇マニュアル_全職員向け.html",type:"doc",desc:"接遇5原則・言葉遣いのルール・クレーム初期対応の基本（全員必読）",updated:"2026/5/6",target:"all"},
+      {title:"接遇マニュアル【新入職員向け】",url:"https://aura-net-system.github.io/docs/01_接遇/接遇マニュアル_新入職員向け.html",type:"doc",desc:"入職初日から使える接遇の基本・具体的な言い回し例・指揮系統のルール",updated:"2026/5/6",target:"all"},
+      {title:"接遇マニュアル【管理者用】",url:"https://aura-net-system.github.io/docs/01_接遇/接遇マニュアル_管理者用.html",type:"doc",desc:"接遇振り返り制度の運用・月次評価基準（4段階）・面談・フィードバックルール",updated:"2026/5/6",target:"all"}
     ]
   },
   {
     category:"苦情・ハラスメント対応",icon:"📢",
     items:[
-      {title:"苦情・カスハラ対応報告書",url:"https://aura-net-system.github.io/docs/02_苦情対応/苦情報告書.html",type:"doc",desc:"苦情・カスハラ発生時の記録様式（内容分類・対応経過・結果・スタッフケア確認）",updated:"2026/5/6"},
-      {title:"苦情対応・カスタマーハラスメント防止マニュアル",url:"https://aura-net-system.github.io/docs/02_苦情対応/苦情対応マニュアル.html",type:"doc",desc:"苦情・カスハラの分類と対応フロー・5分/15分ルール・毅然とした対応フレーズ集",updated:"2026/5/6"}
+      {title:"苦情・カスハラ対応報告書",url:"https://aura-net-system.github.io/docs/02_苦情対応/苦情報告書.html",type:"doc",desc:"苦情・カスハラ発生時の記録様式（内容分類・対応経過・結果・スタッフケア確認）",updated:"2026/5/6",target:"all"},
+      {title:"苦情対応・カスタマーハラスメント防止マニュアル",url:"https://aura-net-system.github.io/docs/02_苦情対応/苦情対応マニュアル.html",type:"doc",desc:"苦情・カスハラの分類と対応フロー・5分/15分ルール・毅然とした対応フレーズ集",updated:"2026/5/6",target:"all"}
     ]
   },
   {
     category:"規定・通達",icon:"📜",
     items:[
-      {title:"内部通報制度規程",url:"https://aura-net-system.github.io/docs/03_規定通達/内部通報制度規程.html",type:"doc",desc:"法令違反・ハラスメント等の通報制度の規程・虚偽通報の判断基準・調査フロー（ver.1.1）",updated:"2026/5/7"},
+      {title:"内部通報制度規程",url:"https://aura-net-system.github.io/docs/03_規定通達/内部通報制度規程.html",type:"doc",desc:"法令違反・ハラスメント等の通報制度の規程・虚偽通報の判断基準・調査フロー（ver.1.1）",updated:"2026/5/7",target:"all"},
       {title:"内部通報制度 掲示",url:"https://drive.google.com/file/d/1MD9hr4J2sVhGs52iADHInfkffyAfipbN/view",type:"pdf",desc:"職場掲示用の制度概要・通報窓口（稲田崇志・稲田智子・山下友利）案内",updated:"2026/5/6"},
       {title:"あなたの声を届ける窓口（内部通報フォーム）",url:"https://docs.google.com/forms/d/e/1FAIpQLSeafk04rm1-KHvGjCzCKKFN8AIvTzjeMtPmx-XTqE0yTnci7A/viewform",type:"form",desc:"内部通報・相談の受付フォーム（匿名可・内容は厳重管理）"}
     ]
@@ -834,18 +851,18 @@ const LINKS_DATA=[
     category:"法人内ルール",icon:"📋",
     sub:[
       {category:"勤怠・休暇",icon:"🗓️",items:[
-        {title:"勤怠打刻カードの管理に関するルール",url:"https://aura-net-system.github.io/docs/04_法人ルール/01_勤怠休暇/勤怠打刻カードの管理に関するルール.html",type:"doc",desc:"打刻カードの携行・保管・不正使用防止ルール",updated:"2025/8/22"},
-        {title:"遅刻時の対応について",url:"https://aura-net-system.github.io/docs/04_法人ルール/01_勤怠休暇/遅刻時の対応について.html",type:"doc",desc:"遅刻の分類・有給適用条件・申告手続きに関する法人ルール",updated:"2025/7/15"}
+        {title:"勤怠打刻カードの管理に関するルール",url:"https://aura-net-system.github.io/docs/04_法人ルール/01_勤怠休暇/勤怠打刻カードの管理に関するルール.html",type:"doc",desc:"打刻カードの携行・保管・不正使用防止ルール",updated:"2025/8/22",target:"all"},
+        {title:"遅刻時の対応について",url:"https://aura-net-system.github.io/docs/04_法人ルール/01_勤怠休暇/遅刻時の対応について.html",type:"doc",desc:"遅刻の分類・有給適用条件・申告手続きに関する法人ルール",updated:"2025/7/15",target:"all"}
       ]},
       {category:"制服・備品貸与",icon:"👔",items:[
-        {title:"制服貸与同意書（返却・破損規定付き）",url:"https://aura-net-system.github.io/docs/04_法人ルール/02_制服備品/制服貸与同意書.html",type:"doc",desc:"業務用制服の貸与・返却・破損に関する同意書",updated:"2026/5/7"}
+        {title:"制服貸与同意書（返却・破損規定付き）",url:"https://aura-net-system.github.io/docs/04_法人ルール/02_制服備品/制服貸与同意書.html",type:"doc",desc:"業務用制服の貸与・返却・破損に関する同意書",updated:"2026/5/7",target:"all"}
       ]},
       {category:"感染対策・安全管理",icon:"🦠",items:[
-        {title:"熱中症予防対策実施マニュアル",url:"https://aura-net-system.github.io/docs/04_法人ルール/04_感染安全/熱中症予防対策マニュアル.html",type:"doc",desc:"メディケアビレッジかしわじまにおける熱中症予防体制・応急対応フロー",updated:"2025/6/17"}
+        {title:"熱中症予防対策実施マニュアル",url:"https://aura-net-system.github.io/docs/04_法人ルール/04_感染安全/熱中症予防対策マニュアル.html",type:"doc",desc:"メディケアビレッジかしわじまにおける熱中症予防体制・応急対応フロー",updated:"2025/6/17",target:"care"}
       ]},
       {category:"機器・設備",icon:"🖨️",items:[
-        {title:"院内空調運用規定",url:"https://aura-net-system.github.io/docs/04_法人ルール/06_機器設備/医院_空調運用規定.html",type:"doc",desc:"いなだ医院の冷暖房使用基準・設定温度・運用ルール",updated:"2025/6/13"},
-        {title:"メディケア空調運用規定",url:"https://aura-net-system.github.io/docs/04_法人ルール/06_機器設備/施設_空調運用規定.html",type:"doc",desc:"メディケアビレッジの冷暖房使用基準・設定温度・運用ルール",updated:"2025/7/25"}
+        {title:"院内空調運用規定",url:"https://aura-net-system.github.io/docs/04_法人ルール/06_機器設備/医院_空調運用規定.html",type:"doc",desc:"いなだ医院の冷暖房使用基準・設定温度・運用ルール",updated:"2025/6/13",target:"clinic"},
+        {title:"メディケア空調運用規定",url:"https://aura-net-system.github.io/docs/04_法人ルール/06_機器設備/施設_空調運用規定.html",type:"doc",desc:"メディケアビレッジの冷暖房使用基準・設定温度・運用ルール",updated:"2025/7/25",target:"care"}
       ]}
     ]
   },
@@ -863,24 +880,24 @@ const LINKS_DATA=[
     ],
     sub:[
       {category:"システム案内・同意書",icon:"📄",items:[
-        {title:"マネーフォワードクラウド メールアドレス収集のお願い",url:"https://aura-net-system.github.io/docs/06_勤怠給与/01_システム案内/マネーフォワード_メールアドレス収集のお願い.html",type:"doc",desc:"勤怠申請・電子給与明細受取のためのメールアドレス登録ご案内（2025年6月）",updated:"2026/5/6"}
+        {title:"マネーフォワードクラウド メールアドレス収集のお願い",url:"https://aura-net-system.github.io/docs/06_勤怠給与/01_システム案内/マネーフォワード_メールアドレス収集のお願い.html",type:"doc",desc:"勤怠申請・電子給与明細受取のためのメールアドレス登録ご案内（2025年6月）",updated:"2026/5/6",target:"all"}
       ]}
     ]
   },
   {
     category:"人事・採用制度",icon:"👥",
     items:[
-      {title:"職員紹介制度 申請書",url:"https://aura-net-system.github.io/docs/07_人事採用/職員紹介制度_申請書.html",type:"doc",desc:"紹介制度利用時の申請書（被紹介者の面接設定前に提出・事務局受付後に採用判定）",updated:"2026/5/6"},
-      {title:"職員紹介制度 要項",url:"https://aura-net-system.github.io/docs/07_人事採用/職員紹介制度_要項.html",type:"doc",desc:"リファラル採用制度の対象職種・報奨金額（常勤・パート3区分）・手続きの流れ",updated:"2026/5/6"}
+      {title:"職員紹介制度 申請書",url:"https://aura-net-system.github.io/docs/07_人事採用/職員紹介制度_申請書.html",type:"doc",desc:"紹介制度利用時の申請書（被紹介者の面接設定前に提出・事務局受付後に採用判定）",updated:"2026/5/6",target:"all"},
+      {title:"職員紹介制度 要項",url:"https://aura-net-system.github.io/docs/07_人事採用/職員紹介制度_要項.html",type:"doc",desc:"リファラル採用制度の対象職種・報奨金額（常勤・パート3区分）・手続きの流れ",updated:"2026/5/6",target:"all"}
     ]
   },
   {
     category:"Google Workspace マニュアル",icon:"🔧",
     items:[
-      {title:"Google Chat 運用ルール",url:"https://aura-net-system.github.io/docs/08_GoogleWorkspace/GoogleChat_運用ルール.html",type:"doc",desc:"Google Chatの利用ルール・投稿形式・セキュリティ要件（医療法人向け）",updated:"2026/5/7"},
-      {title:"Google Drive 運用マニュアル（法人共有）",url:"https://aura-net-system.github.io/docs/08_GoogleWorkspace/GoogleDrive_運用マニュアル.html",type:"doc",desc:"Googleドライブのフォルダ構成・ファイル提出手順・アクセス権限ルール",updated:"2025/6/5"},
-      {title:"Google Workspace 利用マニュアル（管理者向け）",url:"https://aura-net-system.github.io/docs/08_GoogleWorkspace/GoogleWorkspace_利用マニュアル.html",type:"doc",desc:"アカウント付与者向けの各アプリ使い方・棲み分け・セキュリティルール",updated:"2026/5/7"},
-      {title:"Google カレンダー 運用ガイド",url:"https://aura-net-system.github.io/docs/08_GoogleWorkspace/Googleカレンダー_運用ガイド.html",type:"doc",desc:"Googleカレンダーの基本操作・法人運用ルール・注意事項",updated:"2025/8/4"}
+      {title:"Google Chat 運用ルール",url:"https://aura-net-system.github.io/docs/08_GoogleWorkspace/GoogleChat_運用ルール.html",type:"doc",desc:"Google Chatの利用ルール・投稿形式・セキュリティ要件（医療法人向け）",updated:"2026/5/7",target:"all"},
+      {title:"Google Drive 運用マニュアル（法人共有）",url:"https://aura-net-system.github.io/docs/08_GoogleWorkspace/GoogleDrive_運用マニュアル.html",type:"doc",desc:"Googleドライブのフォルダ構成・ファイル提出手順・アクセス権限ルール",updated:"2025/6/5",target:"all"},
+      {title:"Google Workspace 利用マニュアル（管理者向け）",url:"https://aura-net-system.github.io/docs/08_GoogleWorkspace/GoogleWorkspace_利用マニュアル.html",type:"doc",desc:"アカウント付与者向けの各アプリ使い方・棲み分け・セキュリティルール",updated:"2026/5/7",target:"all"},
+      {title:"Google カレンダー 運用ガイド",url:"https://aura-net-system.github.io/docs/08_GoogleWorkspace/Googleカレンダー_運用ガイド.html",type:"doc",desc:"Googleカレンダーの基本操作・法人運用ルール・注意事項",updated:"2025/8/4",target:"all"}
     ]
   }
 ];
@@ -1335,18 +1352,19 @@ async function addStaff(){
   const name=document.getElementById('ns-name').value.trim();
   const facility=document.getElementById('ns-facility').value;
   const role=document.getElementById('ns-role').value;
+  const karteRole=document.getElementById('ns-karte-role')?.value||'';
   const status=document.getElementById('ns-status');
   if(!name){status.style.color='#f87171';status.textContent='氏名を入力してください';return;}
   status.style.color='rgba(255,255,255,.5)';status.textContent='追加中...';
   try{
     const staffId=await generateStaffId();
     document.getElementById('ns-id-preview').placeholder=staffId;
-    await db.collection('staff_accounts').add({
-      staffId,name,facility,role,pin:'0000',active:true,
-      createdAt:firebase.firestore.FieldValue.serverTimestamp()
-    });
+    const doc={staffId,name,facility,role,pin:'0000',active:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()};
+    if(karteRole) doc.karteRole=karteRole;
+    await db.collection('staff_accounts').add(doc);
     status.style.color='#4ade80';status.textContent=`✅ ${name}（${staffId}）を追加しました`;
     document.getElementById('ns-name').value='';
+    document.getElementById('ns-karte-role').value='';
     document.getElementById('ns-id-preview').placeholder='保存時に発行';
     loadStaffList();
   }catch(e){status.style.color='#f87171';status.textContent='エラー: '+e.message;}
