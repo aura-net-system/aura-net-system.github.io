@@ -1003,36 +1003,69 @@ function applyAdminUI(){
   loadAdminSurveys();
 }
 
-// ── 隠しコマンド：ロゴ5連打で管理者モード解除 ──
+// ── 隠しコマンド：ロゴ5連打で管理者モード ──
 (function(){
   let taps=0,timer=null;
-  document.addEventListener('DOMContentLoaded',()=>{
-    const target=document.querySelector('.portal-header');
-    if(!target) return;
-    target.addEventListener('click',function(e){
-      // nav-btnクリックは除外
-      if(e.target.closest('.nav-btn')) return;
+  function setupHiddenCmd(){
+    const logo=document.querySelector('.hd-logo');
+    if(!logo){setTimeout(setupHiddenCmd,300);return;}
+    logo.style.cursor='pointer';
+    logo.addEventListener('click',function(e){
+      e.stopPropagation();
       taps++;
       clearTimeout(timer);
+      logo.style.opacity=taps>0?'0.6':'1';
+      setTimeout(()=>{logo.style.opacity='1';},150);
       if(taps>=5){
         taps=0;
-        const pw=prompt('🔐 管理者コード');
-        if(pw!=null){
-          if(pw==='0405'){
-            isAdmin=true;
-            sessionStorage.setItem('aura_role','admin');
-            applyAdminUI();
-            toast('管理者モードで再接続しました');
-          } else {
-            toast('コードが違います');
-          }
-        }
+        showAdminOverlay();
       } else {
-        timer=setTimeout(()=>{taps=0;},2500);
+        timer=setTimeout(()=>{taps=0;},3000);
       }
     });
-  });
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',setupHiddenCmd);
+  } else {
+    setupHiddenCmd();
+  }
 })();
+
+function showAdminOverlay(){
+  let ov=document.getElementById('admin-overlay');
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='admin-overlay';
+    ov.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(6px)';
+    ov.innerHTML=`<div style="background:#0d2140;border:1px solid rgba(91,191,255,.4);border-radius:16px;padding:28px 24px;width:280px;text-align:center">
+      <div style="font-size:22px;margin-bottom:12px">🔐</div>
+      <div style="color:#fff;font-weight:800;font-size:15px;margin-bottom:16px">管理者コードを入力</div>
+      <input id="admin-code-input" type="password" inputmode="numeric" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid rgba(91,191,255,.4);background:rgba(255,255,255,.1);color:#fff;font-size:18px;text-align:center;outline:none;letter-spacing:.3em" placeholder="••••">
+      <div style="display:flex;gap:10px;margin-top:16px">
+        <button onclick="document.getElementById('admin-overlay').remove()" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:none;color:rgba(255,255,255,.6);cursor:pointer;font-family:inherit">キャンセル</button>
+        <button onclick="checkAdminCode()" style="flex:1;padding:10px;border-radius:8px;border:none;background:linear-gradient(135deg,#1a72c8,#2f8ce0);color:#fff;font-weight:800;cursor:pointer;font-family:inherit">確認</button>
+      </div>
+    </div>`;
+    document.body.appendChild(ov);
+    setTimeout(()=>document.getElementById('admin-code-input').focus(),100);
+    document.getElementById('admin-code-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkAdminCode();});
+    ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
+  }
+}
+function checkAdminCode(){
+  const val=(document.getElementById('admin-code-input')||{}).value||'';
+  const ov=document.getElementById('admin-overlay');
+  if(val==='0405'){
+    isAdmin=true;
+    sessionStorage.setItem('aura_role','admin');
+    applyAdminUI();
+    if(ov)ov.remove();
+    toast('管理者モードに切り替わりました ✓');
+  } else {
+    const inp=document.getElementById('admin-code-input');
+    if(inp){inp.value='';inp.style.borderColor='rgba(255,100,80,.6)';inp.placeholder='コードが違います';}
+  }
+}
 
 // ── ログイン ──
 async function doLogin(){
