@@ -1618,6 +1618,9 @@ auth.onAuthStateChanged(user=>{
     if(sessionStorage.getItem('aura_role')==='facility_admin') isFacilityAdmin=true;
     userFacility=sessionStorage.getItem('aura_facility')||'';
     show('portal-screen');
+    // URLハッシュがあれば対応タブを開く（マニュアルから戻ったときなど）
+    const initHash=location.hash.replace('#','');
+    if(initHash&&document.getElementById('screen-'+initHash)){switchTab(initHash);}
     applyFacilityBadge();
     loadNotices();
     loadSurveys();
@@ -1779,6 +1782,8 @@ function switchTab(tab){
   if(tab==='links'){renderLinks();}
   else{const si=document.getElementById('links-search-input');if(si){si.value='';si.dispatchEvent(new Event('input'));}}
   show('portal-screen');
+  // URLハッシュを更新（戻ったときにタブを復元するため）
+  history.replaceState(null,'',tab==='home'?location.pathname+'#home':'#'+tab);
 }
 
 // ── 掲示板 ──
