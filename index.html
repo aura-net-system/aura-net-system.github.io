@@ -333,7 +333,6 @@ details[open]>.links-subcat-title::after{transform:rotate(-180deg)}
       <label>個人PIN</label>
       <input type="password" id="password" placeholder="4〜6桁のPIN" autocomplete="current-password">
       <button class="btn-login" id="btn-login" onclick="doLogin()">ログイン</button>
-      <p class="login-hint">初回ログインのPINは <strong style="color:rgba(255,255,255,.65)">0000</strong>　｜　全権管理者は隠しコマンドへ</p>
       <div id="login-error"></div>
     </div>
   </div>
@@ -810,7 +809,7 @@ const FB_CONFIG={apiKey:'AIzaSyBxXY1aji7J9H0qwrV76VgPxaHJ4wU9E-I',authDomain:'au
 const FB_SYS_EMAIL='portal@aura-net.local';
 const FB_AUTH_PASS='Ap3#Rz7-Mn4Kw';
 const FB_SYS_PASS='06419001';
-const ADMIN_PASS='06419008';
+const ADMIN_PASS='1234';
 
 const FACILITY_CONFIG=[
   {id:'clinic',   label:'医院',               adminCode:'0601', targets:['all','clinic']},
